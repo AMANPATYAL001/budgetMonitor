@@ -11,9 +11,9 @@ const firebaseConfig = {
     measurementId: "G-8D67WHMPXL"
 };
 
-// const app = firebase.initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 // const db = firebase.firestore();
-// const auth = firebase.auth();
+const auth = firebase.auth();
 
 function getEP() {
     return [document.getElementById('InputEmail').value, document.getElementById('InputPassword').value];
@@ -30,29 +30,29 @@ function getEP() {
 //         })
 // })
 
-// document.getElementById('loginUser').addEventListener('click', () => {
+document.getElementById('loginUser').addEventListener('click', () => {
 
-//     let info = getEP();
+    let info = getEP();
 
-//     auth.signInWithEmailAndPassword(info[0], info[1]).then((res) => {
-//         console.log(res, res.user.uid);
-//         localStorage.setItem('UID', res.user.uid)
-//         location.href = 'dashboard.html';
-//     })
-//         .catch((err) => {
-//             // alert(err.messagingSenderId +" -> "+ err.code);
-//             console.log(err.messagingSenderId + " -> " + err.code);
-//             if (err.code.includes('email'))
-//                 document.getElementById('emailHelp').innerText = 'Invalid UserID'
+    auth.signInWithEmailAndPassword(info[0], info[1]).then((res) => {
+        console.log(res, res.user.uid);
+        localStorage.setItem('UID', res.user.uid)
+        location.href = 'dashboard.html';
+    })
+        .catch((err) => {
+            // alert(err.messagingSenderId +" -> "+ err.code);
+            console.log(err.messagingSenderId + " -> " + err.code);
+            if (err.code.includes('email'))
+                document.getElementById('emailHelp').innerText = 'Invalid UserID'
 
-//             if (err.code.includes('found'))
-//                 document.getElementById('emailHelp').innerText = 'No user with this email'
+            if (err.code.includes('found'))
+                document.getElementById('emailHelp').innerText = 'No user with this email'
             
-//                 if (err.code.includes('password'))
-//                 document.getElementById('passwordHelp').innerText = 'Wrong password'
+                if (err.code.includes('password'))
+                document.getElementById('passwordHelp').innerText = 'Wrong password'
 
-//         })
-// })
+        })
+})
 
 function validateEmail() {
     let email = document.getElementById('InputEmail');
