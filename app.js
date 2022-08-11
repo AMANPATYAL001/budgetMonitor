@@ -11,12 +11,14 @@ const firebaseConfig = {
     measurementId: "G-8D67WHMPXL"
 };
 let getInfo;
+const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 async function setData(){
-    let info = getEP();
+    // let info = getEP();
     let uid = localStorage.getItem('UID');
     // console.log(uid);
     let dbUsers = db.collection('users')
@@ -28,17 +30,28 @@ async function setData(){
         objArray = { 'Data': [document.getElementById('content').value] }
     }
     else {
-        objArray['Data'].push(document.getElementById('content').value)
+        let max=-1;
+        for (const iterator of objArray['Data']) {
+            if(max<iterator.id)
+            max=iterator.id
+        }
+        // let xLabel = objArray['Data'].map(obj => new Date(obj.dateTime).getDate() + ' ' + months[new Date(obj.dateTime).getMonth()]);
+        date=new Date();
+       let dateString= `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
+    //    console.log(dateString,{"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value});
+
+        objArray['Data'].push({"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value})
     }
     dbUsers.doc(uid).set(objArray).then((para) => {
         // console.log(para)
         // console.log(document.getElementById('content').value)
-    }).catch((err) => {
+    })
+    .catch((err) => {
         console.log(err)
     })
 }
 
-// document.getElementById('saveContent').addEventListener('click',setData);
+document.getElementById('saveBtn').addEventListener('click',setData);
 
 async function getContent() {
     let uid = localStorage.getItem('UID');
@@ -182,9 +195,6 @@ async function main() {
         return new Date(b.dateTime) - new Date(a.dateTime);
     });
     // console.log(data);
-
-    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
     // const d = new Date();
     // let day = days[d.getDay()];
