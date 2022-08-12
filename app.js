@@ -17,7 +17,7 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-async function setData(){
+async function setData() {
     // let info = getEP();
     let uid = localStorage.getItem('UID');
     // console.log(uid);
@@ -30,28 +30,28 @@ async function setData(){
         objArray = { 'Data': [document.getElementById('content').value] }
     }
     else {
-        let max=-1;
+        let max = -1;
         for (const iterator of objArray['Data']) {
-            if(max<iterator.id)
-            max=iterator.id
+            if (max < iterator.id)
+                max = iterator.id
         }
         // let xLabel = objArray['Data'].map(obj => new Date(obj.dateTime).getDate() + ' ' + months[new Date(obj.dateTime).getMonth()]);
-        date=new Date();
-       let dateString= `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
-    //    console.log(dateString,{"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value});
+        date = new Date();
+        let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
+        //    console.log(dateString,{"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value});
 
-        objArray['Data'].push({"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value})
+        objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(document.getElementById('amount-no').value), "type": document.getElementById('type-name').value })
     }
     dbUsers.doc(uid).set(objArray).then((para) => {
         // console.log(para)
         // console.log(document.getElementById('content').value)
     })
-    .catch((err) => {
-        console.log(err)
-    })
+        .catch((err) => {
+            console.log(err)
+        })
 }
 
-document.getElementById('saveBtn').addEventListener('click',setData);
+document.getElementById('saveBtn').addEventListener('click', setData);
 
 async function getContent() {
     let uid = localStorage.getItem('UID');
@@ -59,7 +59,7 @@ async function getContent() {
     let dbUsers = await db.collection('users')
     await dbUsers.doc(uid).get().then((para) => {
         console.log(para.data(), 'DATA')
-getInfo=para.data();
+        getInfo = para.data();
         // return para.data();
     }).catch((err) => {
         console.log(err)
@@ -74,7 +74,7 @@ async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
     await getContent();
-    let data=getInfo;
+    let data = getInfo;
     console.log(data);   // array of objects
     data = data['Data']
     // let priceArray = []
@@ -286,3 +286,14 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("wrapper").style.display = "block";
     main();
 });
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+
+$(function () {
+    $('[data-toggle="popover"]').popover({ sanitize: false })
+})
+
+$('.popover-dismiss').popover({
+    trigger: 'focus', sanitize: false
+})

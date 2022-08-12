@@ -71,33 +71,26 @@
             data-bs-parent="#accordionExample">
             <div class="accordion-body">
 
-              <!-- <form>
-
-
-
+              <form>
                 <div class="mb-3">
-                  <label for="validationServerUsername" class="form-label">Username</label>
-                  <div class="input-group has-validation">
-                    <span class="input-group-text" id="inputGroupPrepend3">@</span>
-                    <input type="text" class="form-control is-invalid" id="validationServerUsername" aria-describedby="inputGroupPrepend3 validationServerUsernameFeedback" required>
-                    <div id="validationServerUsernameFeedback" class="invalid-feedback">
-                      Please choose a username.
-                    </div>
-                  </div>
-
-                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                  <label for="exampleInputEmail1" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="signUpInputEmail" aria-describedby="emailHelp" required placeholder="youremail@xyz.com">
+                  <div id="emailSignUpHelp" class="form-text text-danger"></div>
                 </div>
-
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1">
+                  <input type="password" class="form-control" id="signUpInputPassword" placeholder="********" required>
+                  <!-- <div id="passwordHelp" class="form-text text-danger"></div> -->
+
                 </div>
-                <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
+                  <input type="password" class="form-control" id="signUpConfirmInputPassword" placeholder="********" required>
+                  <div id="passwordSignUpHelp" class="form-text text-danger"></div>
+
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </form> -->
+              </form>
+              <button type="submit" class="btn btn-primary" id="signUpBtn">Submit</button>
 
             </div>
           </div>
