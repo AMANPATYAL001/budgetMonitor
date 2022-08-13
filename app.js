@@ -74,8 +74,16 @@ async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
     await getContent();
+    document.getElementById('firstL').style.display='none';
+    document.getElementById('firstS').style.display='none';
+    document.getElementById('firstT').style.display='none';
+    document.getElementById('myChart1').style.display='block';
+    document.getElementById('myChart2').style.display='block';
+    document.getElementById('myChart3').style.display='block';
+
     let data = getInfo;
-    console.log(data);   // array of objects
+    console.log('getData completed');
+    // console.log(data);   // array of objects
     data = data['Data']
     // let priceArray = []
     // let typeArray = []
@@ -280,20 +288,10 @@ async function main() {
 
 
 
-
 window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
     document.getElementById("wrapper").style.display = "block";
     main();
 });
-$(function () {
-    $('[data-toggle="tooltip"]').tooltip()
-})
 
-$(function () {
-    $('[data-toggle="popover"]').popover({ sanitize: false })
-})
 
-$('.popover-dismiss').popover({
-    trigger: 'focus', sanitize: false
-})
