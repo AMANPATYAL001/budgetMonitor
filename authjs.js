@@ -40,11 +40,14 @@ document.getElementById('signUpBtn').addEventListener('click', () => {
 document.getElementById('loginUser').addEventListener('click', () => {
 
     let info = getEP();
+    document.getElementById('loginGIF').style.display = 'inline-block';
+    document.getElementById("loginUser").disabled = true;    
 
     auth.signInWithEmailAndPassword(info[0], info[1]).then((res) => {
-        console.log(res, res.user.uid);
         localStorage.setItem('UID', res.user.uid)
         location.href = 'dashboard.html';
+        document.getElementById('loginGIF').style.display = 'none';
+        document.getElementById("loginUser").disabled = false;
     })
         .catch((err) => {
             // alert(err.messagingSenderId +" -> "+ err.code);
@@ -58,6 +61,8 @@ document.getElementById('loginUser').addEventListener('click', () => {
             if (err.code.includes('password'))
                 document.getElementById('passwordHelp').innerText = 'Wrong password'
 
+            document.getElementById('loginGIF').style.display = 'none';
+            document.getElementById("loginUser").disabled = false;
         })
 })
 

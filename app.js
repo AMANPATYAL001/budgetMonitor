@@ -17,39 +17,123 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", 
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// $('#saveBtn').on('click', () => {
+//     console.log('save btn clicked');
+
+//     console.log($('#type-name').val(), $('#amount-no').val(), Date(), $('#types').val())
+// })
+
 async function setData() {
     // let info = getEP();
     let uid = localStorage.getItem('UID');
     // console.log(uid);
     let dbUsers = db.collection('users')
     await getContent();
-    // console.log(getInfo);
+    let currentAmount;
     let objArray = getInfo;
     if (objArray === undefined) {
-        console.log("undefin", objArray);
+        // console.log("undefin", objArray); // put the credit first
         objArray = { 'Data': [document.getElementById('content').value] }
     }
     else {
+        currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
         let max = -1;
         for (const iterator of objArray['Data']) {
             if (max < iterator.id)
                 max = iterator.id
         }
-        // let xLabel = objArray['Data'].map(obj => new Date(obj.dateTime).getDate() + ' ' + months[new Date(obj.dateTime).getMonth()]);
+
         date = new Date();
         let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
+        let DoC;
+        if ($('#inlineRadio1').is(':checked')) {
+            DoC = 'debit'
+        }
+        else
+            DoC = 'credit'
+        let amount;
+        let type;
+        let dropDownTypeVal = $('#types').val()
+        let inpTypeVal = $('#type-name').val()
+        amount = document.getElementById('amount-no').value
+        if (inpTypeVal.trim().toLowerCase() == 'income')
+            document.getElementById('typeHelpD').innerText = "can't set debit as 'INCOME' type"
+        if (DoC == 'debit') {
+            currentAmount = currentAmount - amount
+            if (inpTypeVal.trim() == '')
+                type = dropDownTypeVal
+            else
+                type = inpTypeVal
+        }
+        else {
+            currentAmount = currentAmount + Number(amount)
+
+            amount = 0;
+            type = 'credit'  //currentAmount
+
+        }
+        if (Number(amount) == 0 || Number(amount)) {
+            if (Number(amount) <= 10 && type == 'debit')
+                document.getElementById('amountHelp').innerText = 'Amount less than 10 not acceptable'
+            else {
+
+                document.getElementById("saveBtn").disabled = true;
+
+                objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount })
+                console.log(objArray['Data']);
+                dbUsers.doc(uid).set(objArray).then((para) => {
+                    // console.log(para)
+                    // console.log(document.getElementById('content').value)
+                    document.getElementById("saveBtn").disabled = false;
+                })
+                    .catch((err) => {
+                        console.log(err)
+                        document.getElementById("saveBtn").disabled = false;
+                    })
+            }
+
+        }
+        else {
+            document.getElementById('amountHelp').innerText = 'Invalid Amount'
+        }
         //    console.log(dateString,{"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value});
 
-        objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(document.getElementById('amount-no').value), "type": document.getElementById('type-name').value })
+        // objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(document.getElementById('amount-no').value), "type": document.getElementById('type-name').value })
     }
-    dbUsers.doc(uid).set(objArray).then((para) => {
-        // console.log(para)
-        // console.log(document.getElementById('content').value)
-    })
-        .catch((err) => {
-            console.log(err)
-        })
+
 }
+function creditCheck() {
+    document.getElementById('types').disabled = true
+    document.getElementById('type-name').disabled = true
+}
+function debitCheck() {
+    document.getElementById('types').disabled = false
+    document.getElementById('type-name').disabled = false
+}
+
+document.getElementById('inlineRadio2').addEventListener('input', creditCheck)
+document.getElementById('inlineRadio1').addEventListener('input', debitCheck)
+
+document.getElementById('type-name').addEventListener('input', typeInfo)
+function typeInfo() {
+    let inpTypeVal = $('#type-name').val()
+    if (inpTypeVal.trim() == '' || inpTypeVal.trim().toLowerCase() == 'income')
+        $('#typeHelpS').text('')
+    else
+        $('#typeHelpS').text(`'${inpTypeVal}' will be takes as new Type`)
+}
+
+function validateAmount() {
+    let amount = document.getElementById('amount-no').value
+
+    if (Number(amount)) {
+        document.getElementById('amountHelp').innerText = ''
+    } else
+        document.getElementById('amountHelp').innerText = 'Invalid Amount'
+
+}
+
+document.getElementById('amount-no').addEventListener('input', validateAmount)
 
 document.getElementById('saveBtn').addEventListener('click', setData);
 
@@ -58,7 +142,7 @@ async function getContent() {
     // console.log(uid);
     let dbUsers = await db.collection('users')
     await dbUsers.doc(uid).get().then((para) => {
-        console.log(para.data(), 'DATA')
+        // console.log(para.data(), 'DATA')
         getInfo = para.data();
         // return para.data();
     }).catch((err) => {
@@ -74,15 +158,14 @@ async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
     await getContent();
-    document.getElementById('firstL').style.display='none';
-    document.getElementById('firstS').style.display='none';
-    document.getElementById('firstT').style.display='none';
-    document.getElementById('myChart1').style.display='block';
-    document.getElementById('myChart2').style.display='block';
-    document.getElementById('myChart3').style.display='block';
+    document.getElementById('firstL').style.display = 'none';
+    document.getElementById('firstS').style.display = 'none';
+    document.getElementById('firstT').style.display = 'none';
+    document.getElementById('myChart1').style.display = 'block';
+    document.getElementById('myChart2').style.display = 'block';
+    document.getElementById('myChart3').style.display = 'block';
 
     let data = getInfo;
-    console.log('getData completed');
     // console.log(data);   // array of objects
     data = data['Data']
     // let priceArray = []
@@ -178,12 +261,6 @@ async function main() {
 
     })
 
-    $('#saveBtn').on('click', () => {
-        console.log('save btn clicked');
-
-        console.log($('#type-name').val(), $('#amount-no').val(), Date(), $('#types').val())
-    })
-
     // $('#addData').popover({
     //     trigger: 'hover',
     //     content: 'Add Data',
@@ -197,11 +274,11 @@ async function main() {
     }
     // console.log(dateToObj);
 
-    data.sort(function (a, b) {
-        // Turn your strings into dates, and then subtract them
-        // to get a value that is either negative, positive, or zero.
-        return new Date(b.dateTime) - new Date(a.dateTime);
-    });
+    // data.sort(function (a, b) {
+    // Turn your strings into dates, and then subtract them
+    // to get a value that is either negative, positive, or zero.
+    // return new Date(b.dateTime) - new Date(a.dateTime);
+    // });
     // console.log(data);
 
     // const d = new Date();
@@ -209,7 +286,7 @@ async function main() {
     // days[new Date(obj.dateTime).getDay()]
 
     let xLabel = data.map(obj => new Date(obj.dateTime).getDate() + ' ' + months[new Date(obj.dateTime).getMonth()]);
-    let yLabel = data.map(obj => obj.price)
+    let yLabel = data.map(obj => obj.currentAmount)
     let typeName = data.map(obj => obj.type)
 
     // console.log(names);
