@@ -205,20 +205,27 @@ async function main() {
 
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
+    console.log(data)
     if (Object.keys(data).length == 0) {
         $("#inlineRadio2").prop("checked", true);
         $('.noData').show();
         
         return false
     }
-    else if (Object.keys(data).length == 1) {
-        $('.noData').text('One more entry !')
-        $('.noData').show();
-        return false
+    else if (data.Data.length == 1) {
+        // $('.alert').show()
+        document.getElementsByClassName('alert')[0].style.display='block'
+        document.getElementsByClassName('alert')[0].setAttribute('style','opacity:1 !important')
+        // $('.noData').text('One more entry !')
+        // $('.noData').show();
+        // return false 
     }
-    else
+    else{
+        console.log('close');
+        document.getElementsByClassName('alert')[0].setAttribute('style','opacity:0 !important')
+        document.getElementsByClassName('alert')[0].style.display='none'
         $('.noData').hide();
-
+    }
 
 
     document.getElementById('myChart1').style.display = 'block';
