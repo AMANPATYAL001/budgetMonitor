@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hi...</title>
+</head>
+
+<body>
+
+
+
+    <script>
+        function groupBy(objectArray, property) {
+            return objectArray.reduce((acc, obj) => {
+                const key = obj[property];
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                // Add object to list for given key's value
+                acc[key].push(obj);
+                return acc;
+            }, {});
+        }
+
+        async function main() {
+            const response = await fetch('data.json');
+            let dataa = await response.json();
+
+            let data = Object.keys(groupBy(dataa.Data, 'onlyData'));
+
+            data.sort(function (a, b) {
+                // Turn your strings into dates, and then subtract them
+                // to get a value that is either negative, positive, or zero.
+                // return new Date(b.onlyDate) - new Date(a.onlyDate);
+                return new Date(a) - new Date(b)
+            });
+            console.log(groupBy(dataa.Data, 'onlyData'));                     
+            console.log(data,groupBy(dataa.Data, 'onlyData')[data[0]]);
+            priceList=[]
+            for (let i = 0; i < data.length; i++) {
+                let a=groupBy(dataa.Data, 'onlyData')[data[i]]
+                let sum=0
+                for (let j = 0; j < a.length; j++) {
+                    sum+=a[j].price
+                    console.log(data[i],sum)
+                }
+                priceList.push(sum)
+            }
+            console.log(priceList);
+
+
+        }
+        main()
+    </script>
+
+
+</body>
+
+</html>

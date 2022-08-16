@@ -23,17 +23,44 @@ const db = firebase.firestore();
 //     console.log($('#type-name').val(), $('#amount-no').val(), Date(), $('#types').val())
 // })
 
+function groupBy(objectArray, property) {
+    return objectArray.reduce((acc, obj) => {
+        const key = obj[property];
+        if (!acc[key]) {
+            acc[key] = [];
+        }
+        // Add object to list for given key's value
+        acc[key].push(obj);
+        return acc;
+    }, {});
+}
+
 async function setData() {
     // let info = getEP();
     let uid = localStorage.getItem('UID');
     // console.log(uid);
     let dbUsers = db.collection('users')
     await getContent();
+    let lineX;
+    let lineY;
     let currentAmount;
     let objArray = getInfo;
-    if (objArray === undefined) {
-        // console.log("undefin", objArray); // put the credit first
-        objArray = { 'Data': [document.getElementById('content').value] }
+    console.log(objArray);
+    date = new Date();
+    let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
+    let dateOnly = date.toDateString().substring(4)
+    let DoC;
+    if ($('#inlineRadio1').is(':checked')) {
+        DoC = 'debit'
+    }
+    else
+        DoC = 'credit'
+    // console.log(objArray,' objArray');
+    if (Object.keys(objArray).length === 0) {
+        
+        // $("#inlineRadio2").prop("checked", true);
+        console.log("undefin", objArray); // put the credit first
+        objArray = { 'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: 0, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }] }
     }
     else {
         currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
@@ -43,8 +70,7 @@ async function setData() {
                 max = iterator.id
         }
 
-        date = new Date();
-        let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
+
         let DoC;
         if ($('#inlineRadio1').is(':checked')) {
             DoC = 'debit'
@@ -79,17 +105,11 @@ async function setData() {
 
                 document.getElementById("saveBtn").disabled = true;
 
-                objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount })
-                console.log(objArray['Data']);
-                dbUsers.doc(uid).set(objArray).then((para) => {
-                    // console.log(para)
-                    // console.log(document.getElementById('content').value)
-                    document.getElementById("saveBtn").disabled = false;
+                objArray['Data'].push({
+                    "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
                 })
-                    .catch((err) => {
-                        console.log(err)
-                        document.getElementById("saveBtn").disabled = false;
-                    })
+                // console.log(objArray['Data']);
+
             }
 
         }
@@ -100,6 +120,15 @@ async function setData() {
 
         // objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(document.getElementById('amount-no').value), "type": document.getElementById('type-name').value })
     }
+    dbUsers.doc(uid).set(objArray).then((para) => {
+        // console.log(para)
+        // console.log(document.getElementById('content').value)
+        document.getElementById("saveBtn").disabled = false;
+    })
+        .catch((err) => {
+            console.log(err)
+            document.getElementById("saveBtn").disabled = false;
+        })
 
 }
 function creditCheck() {
@@ -152,7 +181,19 @@ async function getContent() {
 
 // document.getElementById('getConten').addEventListener('click', getContent)
 
-
+function getSummary(data) {
+    let count = 0;
+    if (data.length >= 10)
+        count = 10
+    else
+        count = data.length
+    let expenditure = 0;
+    for (let i = 0; i < count; i++) {
+        expenditure += data[data.length - 1 - i].price
+    }
+    document.getElementById('gistTotal').innerHTML = `Total Amount is $ <strong>${data[data.length - 1].currentAmount}</strong>`
+    document.getElementById('gistPrev10').innerHTML = `Last ${count} expenditure sum is $ <strong>${expenditure}</strong>`
+}
 // $( document ).ready(function() {
 async function main() {
     // const response = await fetch('data.json');
@@ -161,13 +202,62 @@ async function main() {
     document.getElementById('firstL').style.display = 'none';
     document.getElementById('firstS').style.display = 'none';
     document.getElementById('firstT').style.display = 'none';
+
+    let data = getInfo;
+    document.getElementById('gistGIF').style.display = 'none'
+    if (Object.keys(data).length == 0) {
+        $("#inlineRadio2").prop("checked", true);
+        $('.noData').show();
+        
+        return false
+    }
+    else if (Object.keys(data).length == 1) {
+        $('.noData').text('One more entry !')
+        $('.noData').show();
+        return false
+    }
+    else
+        $('.noData').hide();
+
+
+
     document.getElementById('myChart1').style.display = 'block';
     document.getElementById('myChart2').style.display = 'block';
     document.getElementById('myChart3').style.display = 'block';
-
-    let data = getInfo;
-    // console.log(data);   // array of objects
     data = data['Data']
+    let lineX = [];
+    let lineY = [];
+    let lineType = []
+
+    lineX = Object.keys(groupBy(data, 'dateOnly'));
+    // console.log(lineX);
+    // console.log(groupBy(lineX, 'dateOnly'));
+    let totalAmountList = []
+    for (let i = 0; i < lineX.length; i++) {
+        let a = groupBy(data, 'dateOnly')[lineX[i]]
+        // console.log(a);
+        let sum = 0
+        let strType = '';
+        let lowDebit = Infinity;
+        for (let j = 0; j < a.length; j++) {
+            if (a[j].type !== 'credit') {
+                sum += a[j].price
+                if (lowDebit > a[j].currentAmount)
+                    lowDebit = a[j].currentAmount
+                strType += ' ' + a[j].type
+            }
+            // console.log(data[i],sum)
+        }
+        totalAmountList.push(lowDebit)
+        lineY.push(sum)
+        lineType.push(strType)
+    }
+    console.log(lineY, lineX);
+    // console.log(lineType);
+
+    // console.log(data);   // array of objects
+    document.getElementById('gistCard').style.display = 'block'
+    getSummary(data);
     // let priceArray = []
     // let typeArray = []
     let priceTypeObj = {};
@@ -179,7 +269,7 @@ async function main() {
         else
             priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
     }
-    // console.log(priceTypeObj);
+    console.log(priceTypeObj);
 
     const myChart1 = new Chart(ctx1, {
         options: {
@@ -219,6 +309,7 @@ async function main() {
             labels: Object.keys(priceTypeObj)
         }
     })
+    // console.log(Array(Object.values(priceTypeObj).length).fill(Object.values(priceTypeObj).reduce((a, b) => a + b, 0) / Object.values(priceTypeObj).length))
 
     const myChart2 = new Chart(ctx2, {
         type: 'doughnut',
@@ -229,7 +320,7 @@ async function main() {
             labels: Object.keys(priceTypeObj),
             datasets: [{
                 label: 'Average Price',
-                data: Array(Object.values(priceTypeObj).length).fill(Object.values(priceTypeObj).reduce((a, b) => a + b, 0) / Object.values(priceTypeObj).length),
+                data: Object.values(priceTypeObj),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -256,10 +347,10 @@ async function main() {
         option = $(`<option value="${i}">${i}</option>`)
         $('#types').append(option)
     }
-    $('#types').change(function () {
-        console.log('change', $(this).val());
+    // $('#types').change(function () {
+    //     console.log('change', $(this).val());
 
-    })
+    // })
 
     // $('#addData').popover({
     //     trigger: 'hover',
@@ -268,10 +359,10 @@ async function main() {
     // })
 
     // let dateToObj={}
-    for (let i of data) {
-        // console.log(i.dateTime);
-        // dateToObj[i.dateTime]=i;
-    }
+    // for (let i of data) {
+    // console.log(i.dateTime);
+    // dateToObj[i.dateTime]=i;
+    // }
     // console.log(dateToObj);
 
     // data.sort(function (a, b) {
@@ -293,7 +384,7 @@ async function main() {
     const myChart3 = new Chart(ctx3, {
         type: 'line',
         data: {
-            labels: xLabel,
+            labels: lineX,
             datasets: [{
                 pointStyle: 'circle',
                 radius: 6,
@@ -306,7 +397,7 @@ async function main() {
                     below: '#fbd4d9'    // And blue below the origin
                 },
                 label: 'Price',
-                data: yLabel,
+                data: lineY,
                 // borderColor:
                 //                 function(context) {
                 //                     // console.log(context.raw);
@@ -322,7 +413,6 @@ async function main() {
 
             responsive: true,
 
-
             plugins: {
                 tooltip: {
                     cornerRadius: 6,
@@ -333,12 +423,12 @@ async function main() {
                     borderWidth: 2,
                     callbacks: {
                         title: function (t, d) {
-                            return typeName[t[0].dataIndex];
+                            // console.log(t, d);
+                            return "Today's:$ " + lineY[t[0].dataIndex];
                         },
                         label: function (t, d) {
-                            // console.log(t, d);
 
-                            return t.label + ' ' + '$' + t.raw;
+                            return lineType[t.dataIndex] + ' Total: ' + totalAmountList[t.dataIndex];
                         },
                         labelColor: function (context) {
 
@@ -361,6 +451,8 @@ async function main() {
             }
         }
     })
+    // console.log(myChart3.data.datasets);
+    // console.log(myChart3.data.labels);
 }
 
 
@@ -368,7 +460,11 @@ async function main() {
 window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
     document.getElementById("wrapper").style.display = "block";
-    main();
+    
+    // if(main()){
+    // console.log('again');
+        main()
+    // }
 });
 
 

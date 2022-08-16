@@ -3,7 +3,7 @@
 * {
   padding: 0;
   margin: 0;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   scrollbar-gutter: stable;
 }
 
@@ -27,10 +27,10 @@ h1 {
   display: none;
 }
 
-#myChart2 {
+/* #myChart2 {
   width: 100%;
   height: 100%;
-}
+} */
 
 @media screen and (max-width: 600px) {
   p {
@@ -91,4 +91,23 @@ h1 {
 }
 #myChart3{
   display: none;
+}
+
+#gistCard{
+  margin-top: 10px;
+  display: none;
+}
+
+#gistGIF{
+  width: 50px;
+}
+
+.chartGIF{
+  width: 80px;
+}
+
+.noData{
+text-align: center;
+color: darkgray;
+display: none;
 }
