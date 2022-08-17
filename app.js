@@ -57,10 +57,11 @@ async function setData() {
         DoC = 'credit'
     // console.log(objArray,' objArray');
     if (Object.keys(objArray).length === 0) {
-        
+
         // $("#inlineRadio2").prop("checked", true);
+        let price = Number(amount = document.getElementById('amount-no').value)
         console.log("undefin", objArray); // put the credit first
-        objArray = { 'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: 0, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }] }
+        objArray = { 'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }] }
     }
     else {
         currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
@@ -94,7 +95,7 @@ async function setData() {
         else {
             currentAmount = currentAmount + Number(amount)
 
-            amount = 0;
+            // amount = 0;
             type = 'credit'  //currentAmount
 
         }
@@ -183,16 +184,37 @@ async function getContent() {
 
 function getSummary(data) {
     let count = 0;
-    if (data.length >= 10)
-        count = 10
-    else
-        count = data.length
-    let expenditure = 0;
-    for (let i = 0; i < count; i++) {
-        expenditure += data[data.length - 1 - i].price
+    for (let i = 0; i < data.length; i++) {
+        if (count == 10) {
+            count = 10
+            break
+        }
+        if (data[i].type != 'credit')
+            count++
+
+
     }
-    document.getElementById('gistTotal').innerHTML = `Total Amount is $ <strong>${data[data.length - 1].currentAmount}</strong>`
+    let expenditure = 0;
+    let creditMonth = 0;
+    for (let i = data.length-1; i >=0; i--) {
+        if (data[i].type != 'credit')
+        expenditure += data[i].price
+    }
+
+    let date = new Date()
+    let month = months[date.getMonth()].substring(0, 3)
+    let year = date.getFullYear()
+
+    for (let i = data.length - 1; i >= 0; i--) {
+        if (/\w{3}\s/.exec(data[i].dateOnly)[0].trim() == month && /\s\d{4}/.exec(data[i].dateOnly)[0].trim() == year && data[i].type == 'credit') {
+            creditMonth += data[i].price
+        }
+
+
+    }
+    document.getElementById('gistTotal').innerHTML = `Current total Amount is $ <strong>${data[data.length - 1].currentAmount}</strong>`
     document.getElementById('gistPrev10').innerHTML = `Last ${count} expenditure sum is $ <strong>${expenditure}</strong>`
+    document.getElementById('gistCreditM').innerHTML = `This month's credit is $ <strong>${creditMonth}</strong>`
 }
 // $( document ).ready(function() {
 async function main() {
@@ -205,25 +227,25 @@ async function main() {
 
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
-    console.log(data)
+    // console.log(data)
     if (Object.keys(data).length == 0) {
         $("#inlineRadio2").prop("checked", true);
         $('.noData').show();
-        
+
         return false
     }
     else if (data.Data.length == 1) {
         // $('.alert').show()
-        document.getElementsByClassName('alert')[0].style.display='block'
-        document.getElementsByClassName('alert')[0].setAttribute('style','opacity:1 !important')
+        document.getElementsByClassName('alert')[0].style.display = 'block'
+        document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:1 !important')
         // $('.noData').text('One more entry !')
         // $('.noData').show();
         // return false 
     }
-    else{
-        console.log('close');
-        document.getElementsByClassName('alert')[0].setAttribute('style','opacity:0 !important')
-        document.getElementsByClassName('alert')[0].style.display='none'
+    else {
+        // console.log('close');
+        document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:0 !important')
+        document.getElementsByClassName('alert')[0].style.display = 'none'
         $('.noData').hide();
     }
 
@@ -259,7 +281,7 @@ async function main() {
         lineY.push(sum)
         lineType.push(strType)
     }
-    console.log(lineY, lineX);
+    // console.log(lineY, lineX);
     // console.log(lineType);
 
     // console.log(data);   // array of objects
@@ -271,10 +293,12 @@ async function main() {
     for (let i = 0; i < data.length; i++) {
         // typeArray.push(data[i].type)
         // priceArray.push(data[i].price);
-        if (!priceTypeObj[data[i].type])
-            priceTypeObj[data[i].type] = data[i].price;
-        else
-            priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
+        if (data[i].type != 'credit') {
+            if (!priceTypeObj[data[i].type])
+                priceTypeObj[data[i].type] = data[i].price;
+            else
+                priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
+        }
     }
     console.log(priceTypeObj);
 
@@ -467,10 +491,10 @@ async function main() {
 window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
     document.getElementById("wrapper").style.display = "block";
-    
+
     // if(main()){
     // console.log('again');
-        main()
+    main()
     // }
 });
 
