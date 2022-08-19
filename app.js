@@ -285,7 +285,7 @@ async function main() {
     // console.log(lineType);
 
     // console.log(data);   // array of objects
-    document.getElementById('gistCard').style.display = 'block'
+    // document.getElementById('gistCard').style.display = 'block'
     getSummary(data);
     // let priceArray = []
     // let typeArray = []
@@ -420,15 +420,16 @@ async function main() {
                 pointStyle: 'circle',
                 radius: 6,
                 hoverRadius: 10,
-                backgroundColor: 'white',
-                fill: {
+                backgroundColor: '#ff6384',
+                // fill: {
 
-                    target: 'origin',
-                    above: '#ceebdd',   // Area will be red above the origin
-                    below: '#fbd4d9'    // And blue below the origin
-                },
+                //     target: 'origin',
+                //     above: '#ff6384',   // Area will be red above the origin
+                //     below: '#ff6384'    // And blue below the origin
+                // },
                 label: 'Price',
                 data: lineY,
+                borderColor:'#ff6384'  //#36a2eb
                 // borderColor:
                 //                 function(context) {
                 //                     // console.log(context.raw);
@@ -438,6 +439,58 @@ async function main() {
                 //                     return {
                 //                         borderColor: bordercolor,
                 // }}}]
+            },{
+                
+                    pointStyle: 'line',
+                    radius: 6,
+                    hoverRadius: 10,
+                    backgroundColor: 'blue',
+                    // fill: {
+    
+                    //     target: 'origin',
+                    //     above: '#ff6384',   // Area will be red above the origin
+                    //     below: '#ff6384'    // And blue below the origin
+                    // },
+                    label: 'Price',
+                    data: [300,100],
+                    borderColor:'#36a2eb'  //
+                    // borderColor:
+                    //                 function(context) {
+                    //                     // console.log(context.raw);
+    
+                    //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+                    //                     // console.log(bordercolor);
+                    //                     return {
+                    //                         borderColor: bordercolor,
+                    // }}}]
+                
+            },{
+                
+                
+                    pointStyle: 'circle',
+                    radius: 6,
+                    hoverRadius: 10,
+                    backgroundColor: '#36a2eb',
+                    // fill: {
+    
+                    //     target: 'origin',
+                    //     above: '#ff6384',   // Area will be red above the origin
+                    //     below: '#ff6384'    // And blue below the origin
+                    // },
+                    label: 'Price',
+                    data: [300,100],
+                    borderColor:'#36a2eb'  //
+                    // borderColor:
+                    //                 function(context) {
+                    //                     // console.log(context.raw);
+    
+                    //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+                    //                     // console.log(bordercolor);
+                    //                     return {
+                    //                         borderColor: bordercolor,
+                    // }}}]
+                
+            
             }]
         },
         options: {
@@ -447,9 +500,9 @@ async function main() {
             plugins: {
                 tooltip: {
                     cornerRadius: 6,
-                    backgroundColor: '#FAFAFA',
+                    backgroundColor: '#ff6384',
                     titleColor: '#000000',
-                    borderColor: 'rgba(0,128,0,1)',
+                    borderColor: '#ff6384',
                     usePointStyle: false,
                     borderWidth: 2,
                     callbacks: {
@@ -461,18 +514,19 @@ async function main() {
 
                             return lineType[t.dataIndex] + ' Total: ' + totalAmountList[t.dataIndex];
                         },
-                        labelColor: function (context) {
+                        // labelColor: function (context) {
 
-                            let bordercolor = context.raw > 0 ? 'lightgreen' : 'black';
-                            return {
-                                borderColor: bordercolor,
-                                backgroundColor: 'rgb(255,0,0)',
-                                // color:'#000000',
-                                borderWidth: 2,
-                                borderDash: [2, 2],
-                                borderRadius: 2,
-                            };
-                        },
+                        //     let bordercolor = context.raw > 0 ? 'lightgreen' : 'black';
+                        //     return {
+                        //         borderColor: bordercolor,
+                        //         backgroundColor: 'rgb(255,0,0)',
+                        //         // color:'#000000',
+                        //         borderWidth: 2,
+                        //         borderDash: [2, 2],
+                        //         borderRadius: 2,
+                        //     };
+                        // },
+                        borderColor:'#ff6384',
                         labelTextColor: function (context) {
                             return '#000000';
                         }

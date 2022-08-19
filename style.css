@@ -45,7 +45,7 @@ h1 {
   h1 {
     font-size: 2rem;
   }
-  
+
   #beerImg {
     width: 100px;
     height: auto;
@@ -53,13 +53,16 @@ h1 {
 }
 
 @media screen and (max-width: 600px) {
-  .arrow{
+  .arrow {
     position: static !important;
     justify-content: right !important;
+  }
+}
 
-    /* right: auto;
-    bottom: 0; */
-    /* background-color: #34b7a7; */
+@media screen and (max-width: 990px) {
+
+  #transparent {
+    position: relative !important;
   }
 }
 
@@ -77,37 +80,47 @@ h1 {
   align-items: center;
   z-index: 999;
 }
-.chartGIF{
+
+.chartGIF {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
-#myChart1{
-  display: none;
-}
-#myChart2{
-  display: none;
-}
-#myChart3{
+#myChart1 {
   display: none;
 }
 
-#gistCard{
+#myChart2 {
+  display: none;
+}
+
+#myChart3 {
+  display: none;
+}
+
+#gistCard {
   margin-top: 10px;
   display: none;
 }
 
-#gistGIF{
+#gistGIF {
   width: 50px;
 }
 
-.chartGIF{
+.chartGIF {
   width: 80px;
 }
 
-.noData{
-text-align: center;
-color: darkgray;
-display: none;
+.noData {
+  text-align: center;
+  color: darkgray;
+  display: none;
+}
+
+
+
+#transparent {
+  background-color: #e3f2fd;
+  opacity: .8;
 }
