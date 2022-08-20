@@ -34,12 +34,12 @@ function groupBy(objectArray, property) {
         return acc;
     }, {});
 }
+const dbUsers = db.collection('users')
+const uid = localStorage.getItem('UID');
 
 async function setData() {
     // let info = getEP();
-    let uid = localStorage.getItem('UID');
     // console.log(uid);
-    let dbUsers = db.collection('users')
     await getContent();
     let lineX;
     let lineY;
@@ -56,12 +56,14 @@ async function setData() {
     else
         DoC = 'credit'
     // console.log(objArray,' objArray');
-    if (Object.keys(objArray).length === 0) {
+    if (Object.keys(objArray).length === 1) {
 
         // $("#inlineRadio2").prop("checked", true);
         let price = Number(amount = document.getElementById('amount-no').value)
         console.log("undefin", objArray); // put the credit first
-        objArray = { 'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }] }
+        objArray = {
+            'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }]
+        }
     }
     else {
         currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
@@ -117,9 +119,6 @@ async function setData() {
         else {
             document.getElementById('amountHelp').innerText = 'Invalid Amount'
         }
-        //    console.log(dateString,{"id":max+1,"dateTime":dateString,price:Number(document.getElementById('amount-no').value),"type":document.getElementById('type-name').value});
-
-        // objArray['Data'].push({ "id": max + 1, "dateTime": dateString, price: Number(document.getElementById('amount-no').value), "type": document.getElementById('type-name').value })
     }
     dbUsers.doc(uid).set(objArray).then((para) => {
         // console.log(para)
@@ -145,6 +144,7 @@ document.getElementById('inlineRadio2').addEventListener('input', creditCheck)
 document.getElementById('inlineRadio1').addEventListener('input', debitCheck)
 
 document.getElementById('type-name').addEventListener('input', typeInfo)
+
 function typeInfo() {
     let inpTypeVal = $('#type-name').val()
     if (inpTypeVal.trim() == '' || inpTypeVal.trim().toLowerCase() == 'income')
@@ -182,6 +182,53 @@ async function getContent() {
 
 // document.getElementById('getConten').addEventListener('click', getContent)
 
+// function getDeviceInfo() {
+//     let uid = localStorage.getItem('UID');
+//     // console.log(uid);
+//     let dbUsers = await db.collection('users')
+//     await dbUsers.doc(uid).get().then((para) => {
+//         // console.log(para.data(), 'DATA')
+//         getInfo = para.data();
+//         // return para.data();
+//     }).catch((err) => {
+//         console.log(err)
+//     })
+// }
+
+function setDeviceInfo() {
+    let browserName = navigator.userAgentData.brands[2].brand;
+    let browserVersion = navigator.userAgentData.brands[2].version;
+    let platformName = navigator.userAgentData.platform;
+    let loginData = {}
+    if (!getInfo.loginInfo) {
+        getInfo['loginInfo'] = [{
+            'browserName': browserName,
+            'browserVersion': browserVersion,
+            'platformName': platformName,
+            'dateTime': new Date()
+        }]
+        console.log('1...');
+    }
+    else
+        getInfo.loginInfo.push({
+            'browserName': browserName,
+            'browserVersion': browserVersion,
+            'platformName': platformName,
+            'date': new Date().toDateString(),
+            'time': new Date().toTimeString()
+        })
+
+    dbUsers.doc(uid).set(getInfo).then((para) => {
+        // console.log(para)
+        // console.log(document.getElementById('content').value)
+        document.getElementById("saveBtn").disabled = false;
+    })
+        .catch((err) => {
+            console.log(err)
+            document.getElementById("saveBtn").disabled = false;
+        })
+}
+
 function getSummary(data) {
     let count = 0;
     for (let i = 0; i < data.length; i++) {
@@ -196,9 +243,9 @@ function getSummary(data) {
     }
     let expenditure = 0;
     let creditMonth = 0;
-    for (let i = data.length-1; i >=0; i--) {
+    for (let i = data.length - 1; i >= 0; i--) {
         if (data[i].type != 'credit')
-        expenditure += data[i].price
+            expenditure += data[i].price
     }
 
     let date = new Date()
@@ -227,8 +274,10 @@ async function main() {
 
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
-    // console.log(data)
-    if (Object.keys(data).length == 0) {
+    console.log(data.loginInfo)
+    // setDeviceInfo();
+
+    if (Object.keys(data).length == 1) {
         $("#inlineRadio2").prop("checked", true);
         $('.noData').show();
 
@@ -248,6 +297,11 @@ async function main() {
         document.getElementsByClassName('alert')[0].style.display = 'none'
         $('.noData').hide();
     }
+    // getDeviceInfo();
+    $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
+    $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].date+getInfo.loginInfo[getInfo.loginInfo.length - 2].time)
+    console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
+    $('.toast').toast('show');
 
 
     document.getElementById('myChart1').style.display = 'block';
@@ -429,7 +483,7 @@ async function main() {
                 // },
                 label: 'Price',
                 data: lineY,
-                borderColor:'#ff6384'  //#36a2eb
+                borderColor: '#ff6384'  //#36a2eb
                 // borderColor:
                 //                 function(context) {
                 //                     // console.log(context.raw);
@@ -439,58 +493,58 @@ async function main() {
                 //                     return {
                 //                         borderColor: bordercolor,
                 // }}}]
-            },{
-                
-                    pointStyle: 'line',
-                    radius: 6,
-                    hoverRadius: 10,
-                    backgroundColor: 'blue',
-                    // fill: {
-    
-                    //     target: 'origin',
-                    //     above: '#ff6384',   // Area will be red above the origin
-                    //     below: '#ff6384'    // And blue below the origin
-                    // },
-                    label: 'Price',
-                    data: [300,100],
-                    borderColor:'#36a2eb'  //
-                    // borderColor:
-                    //                 function(context) {
-                    //                     // console.log(context.raw);
-    
-                    //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-                    //                     // console.log(bordercolor);
-                    //                     return {
-                    //                         borderColor: bordercolor,
-                    // }}}]
-                
-            },{
-                
-                
-                    pointStyle: 'circle',
-                    radius: 6,
-                    hoverRadius: 10,
-                    backgroundColor: '#36a2eb',
-                    // fill: {
-    
-                    //     target: 'origin',
-                    //     above: '#ff6384',   // Area will be red above the origin
-                    //     below: '#ff6384'    // And blue below the origin
-                    // },
-                    label: 'Price',
-                    data: [300,100],
-                    borderColor:'#36a2eb'  //
-                    // borderColor:
-                    //                 function(context) {
-                    //                     // console.log(context.raw);
-    
-                    //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-                    //                     // console.log(bordercolor);
-                    //                     return {
-                    //                         borderColor: bordercolor,
-                    // }}}]
-                
-            
+            }, {
+
+                pointStyle: 'line',
+                radius: 6,
+                hoverRadius: 10,
+                backgroundColor: 'blue',
+                // fill: {
+
+                //     target: 'origin',
+                //     above: '#ff6384',   // Area will be red above the origin
+                //     below: '#ff6384'    // And blue below the origin
+                // },
+                label: 'Price',
+                data: [300, 100],
+                borderColor: '#36a2eb'  //
+                // borderColor:
+                //                 function(context) {
+                //                     // console.log(context.raw);
+
+                //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+                //                     // console.log(bordercolor);
+                //                     return {
+                //                         borderColor: bordercolor,
+                // }}}]
+
+            }, {
+
+
+                pointStyle: 'circle',
+                radius: 6,
+                hoverRadius: 10,
+                backgroundColor: '#36a2eb',
+                // fill: {
+
+                //     target: 'origin',
+                //     above: '#ff6384',   // Area will be red above the origin
+                //     below: '#ff6384'    // And blue below the origin
+                // },
+                label: 'Price',
+                data: [300, 100],
+                borderColor: '#36a2eb'  //
+                // borderColor:
+                //                 function(context) {
+                //                     // console.log(context.raw);
+
+                //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+                //                     // console.log(bordercolor);
+                //                     return {
+                //                         borderColor: bordercolor,
+                // }}}]
+
+
             }]
         },
         options: {
@@ -526,7 +580,7 @@ async function main() {
                         //         borderRadius: 2,
                         //     };
                         // },
-                        borderColor:'#ff6384',
+                        borderColor: '#ff6384',
                         labelTextColor: function (context) {
                             return '#000000';
                         }
@@ -546,8 +600,14 @@ window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
     document.getElementById("wrapper").style.display = "block";
 
-    // if(main()){
+    // if(main()){getContent
     // console.log('again');
+//     let hue=0
+//     document.getElementById('titleBM').addEventListener('onmouseover',function (){
+//         hue+=Math.floor(Math.random() *15);
+//         this.style.color='hsl('+hue+',100%,50%)';
+// console.log(this);
+//     })
     main()
     // }
 });
