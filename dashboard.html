@@ -26,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    <a class="nav-link active"data-bs-toggle="modal" href="" data-bs-target="#exampleModal" id="addData">Features</a>
+                    <a class="nav-link active"data-bs-toggle="modal" href="" data-bs-target="#exampleModal" id="addData">Add+</a>
                     <a class="nav-link active" href="" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Quick Look👀</a>
                     <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" -->
@@ -39,12 +39,19 @@
     <img src="res/Magnify-1s-200px.gif" id="gifLoader" style="width:150px;height:auto;">
 
     <div id="wrapper">
-        <div class="alert alert-warning alert-dismissible fade container" style="display:none;" role="alert">
+        <!-- <div class="alert alert-warning alert-dismissible fade container" style="display:none;" role="alert">
             <strong>One MORE</strong> entry will look good.
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-        </div>
+        </div> -->
+        <div class="alert alert-warning d-flex container align-items-center alert-dismissible fade" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div>
+                <strong>One MORE</strong> entry will look good.
+            </div>
+          </div>
 
 
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

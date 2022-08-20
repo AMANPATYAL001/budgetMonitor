@@ -275,7 +275,7 @@ async function main() {
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
     console.log(data.loginInfo)
-    // setDeviceInfo();
+    setDeviceInfo();
 
     if (Object.keys(data).length == 1) {
         $("#inlineRadio2").prop("checked", true);
@@ -284,12 +284,12 @@ async function main() {
         return false
     }
     else if (data.Data.length == 1) {
-        // $('.alert').show()
+        $('.noData').show();
         document.getElementsByClassName('alert')[0].style.display = 'block'
         document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:1 !important')
         // $('.noData').text('One more entry !')
         // $('.noData').show();
-        // return false 
+        return false 
     }
     else {
         // console.log('close');
@@ -298,10 +298,15 @@ async function main() {
         $('.noData').hide();
     }
     // getDeviceInfo();
-    $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
-    $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].date+getInfo.loginInfo[getInfo.loginInfo.length - 2].time)
-    console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
-    $('.toast').toast('show');
+    try {
+        $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
+
+        $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].date + getInfo.loginInfo[getInfo.loginInfo.length - 2].time)
+        console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
+        $('.toast').toast('show');
+    }
+    catch (error) {
+    }
 
 
     document.getElementById('myChart1').style.display = 'block';
@@ -602,12 +607,12 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // if(main()){getContent
     // console.log('again');
-//     let hue=0
-//     document.getElementById('titleBM').addEventListener('onmouseover',function (){
-//         hue+=Math.floor(Math.random() *15);
-//         this.style.color='hsl('+hue+',100%,50%)';
-// console.log(this);
-//     })
+    //     let hue=0
+    //     document.getElementById('titleBM').addEventListener('onmouseover',function (){
+    //         hue+=Math.floor(Math.random() *15);
+    //         this.style.color='hsl('+hue+',100%,50%)';
+    // console.log(this);
+    //     })
     main()
     // }
 });
