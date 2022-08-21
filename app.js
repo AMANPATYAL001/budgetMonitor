@@ -1,6 +1,13 @@
 const ctx1 = document.getElementById('myChart1').getContext('2d');
 const ctx2 = document.getElementById('myChart2').getContext('2d');
 const ctx3 = document.getElementById('myChart3').getContext('2d');
+let myChart1;
+let myChart2;
+let myChart3;
+let lineX= [];
+let lineY= [];
+let totalAmountList=[];
+
 const firebaseConfig = {
     apiKey: "AIzaSyAHMHAHTCMnkxL_N2zLyA52QliQtk5jaqQ",
     authDomain: "budgetmonitor-68d6a.firebaseapp.com",
@@ -41,8 +48,8 @@ async function setData() {
     // let info = getEP();
     // console.log(uid);
     await getContent();
-    let lineX;
-    let lineY;
+    // let lineX;
+    // let lineY;
     let currentAmount;
     let objArray = getInfo;
     console.log(objArray);
@@ -59,11 +66,11 @@ async function setData() {
     if (Object.keys(objArray).length === 1) {
 
         // $("#inlineRadio2").prop("checked", true);
+        console.log('111..');
         let price = Number(amount = document.getElementById('amount-no').value)
         console.log("undefin", objArray); // put the credit first
-        objArray = {
-            'Data': [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: document.getElementById('amount-no').value, dateTime: dateString }]
-        }
+        objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: Number(document.getElementById('amount-no').value), dateTime: dateString }]
+
     }
     else {
         currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
@@ -120,6 +127,26 @@ async function setData() {
             document.getElementById('amountHelp').innerText = 'Invalid Amount'
         }
     }
+    let piepriceType = priceTypeFunction(objArray.Data)
+    // console.log(myChart2.data.labels);
+    // console.log(myChart2.data.datasets);
+    if (myChart1 !== undefined) {
+        myChart2.data.labels = Object.keys(piepriceType)
+        myChart2.data.datasets[0].data = Object.values(piepriceType)
+        myChart2.update();
+
+        myChart1.data.labels = Object.keys(piepriceType)
+        myChart1.data.datasets[0].data = Object.values(piepriceType)
+        myChart1.data.datasets[1].data = Array(Object.values(piepriceType).length).fill(Object.values(piepriceType).reduce((a, b) => a + b, 0) / Object.values(piepriceType).length)
+        myChart1.update();
+
+        myChart3.data.labels = lineX
+        myChart3.data.datasets[0].data = totalAmountList
+        myChart3.data.datasets[1].data = lineY
+        console.log(lineX,lineY,totalAmountList);
+        myChart3.update();
+    }
+
     dbUsers.doc(uid).set(objArray).then((para) => {
         // console.log(para)
         // console.log(document.getElementById('content').value)
@@ -180,47 +207,25 @@ async function getContent() {
     })
 }
 
-// document.getElementById('getConten').addEventListener('click', getContent)
-
-// function getDeviceInfo() {
-//     let uid = localStorage.getItem('UID');
-//     // console.log(uid);
-//     let dbUsers = await db.collection('users')
-//     await dbUsers.doc(uid).get().then((para) => {
-//         // console.log(para.data(), 'DATA')
-//         getInfo = para.data();
-//         // return para.data();
-//     }).catch((err) => {
-//         console.log(err)
-//     })
-// }
-
 function setDeviceInfo() {
     let browserName = navigator.userAgentData.brands[2].brand;
     let browserVersion = navigator.userAgentData.brands[2].version;
     let platformName = navigator.userAgentData.platform;
-    let loginData = {}
+    let loginData = {
+        'browserName': browserName,
+        'browserVersion': browserVersion,
+        'platformName': platformName,
+        'loginDate': new Date().toDateString(),
+        'loginTime': new Date().toTimeString(),
+        'mobile': navigator.userAgentData.mobile
+    }
     if (!getInfo.loginInfo) {
-        getInfo['loginInfo'] = [{
-            'browserName': browserName,
-            'browserVersion': browserVersion,
-            'platformName': platformName,
-            'dateTime': new Date()
-        }]
-        console.log('1...');
+        getInfo['loginInfo'] = [loginData]
     }
     else
-        getInfo.loginInfo.push({
-            'browserName': browserName,
-            'browserVersion': browserVersion,
-            'platformName': platformName,
-            'date': new Date().toDateString(),
-            'time': new Date().toTimeString()
-        })
+        getInfo.loginInfo.push(loginData)
 
     dbUsers.doc(uid).set(getInfo).then((para) => {
-        // console.log(para)
-        // console.log(document.getElementById('content').value)
         document.getElementById("saveBtn").disabled = false;
     })
         .catch((err) => {
@@ -263,6 +268,20 @@ function getSummary(data) {
     document.getElementById('gistPrev10').innerHTML = `Last ${count} expenditure sum is $ <strong>${expenditure}</strong>`
     document.getElementById('gistCreditM').innerHTML = `This month's credit is $ <strong>${creditMonth}</strong>`
 }
+
+function priceTypeFunction(dataArray) {
+    let priceTypeObj = {}
+    for (let i = 0; i < dataArray.length; i++) {
+        if (dataArray[i].type != 'credit') {
+            if (!priceTypeObj[dataArray[i].type])
+                priceTypeObj[dataArray[i].type] = dataArray[i].price;
+            else
+                priceTypeObj[dataArray[i].type] = priceTypeObj[dataArray[i].type] + dataArray[i].price;
+        }
+    }
+    // console.log(priceTypeObj);
+    return priceTypeObj
+}
 // $( document ).ready(function() {
 async function main() {
     // const response = await fetch('data.json');
@@ -275,21 +294,23 @@ async function main() {
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
     console.log(data.loginInfo)
-    setDeviceInfo();
+    // setDeviceInfo();
 
     if (Object.keys(data).length == 1) {
         $("#inlineRadio2").prop("checked", true);
+        $('.noData').text('NO DATA!!')
         $('.noData').show();
 
         return false
     }
     else if (data.Data.length == 1) {
+        $('.noData').text('Not enough data')
         $('.noData').show();
         document.getElementsByClassName('alert')[0].style.display = 'block'
         document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:1 !important')
         // $('.noData').text('One more entry !')
         // $('.noData').show();
-        return false 
+        return false
     }
     else {
         // console.log('close');
@@ -301,8 +322,12 @@ async function main() {
     try {
         $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
 
-        $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].date + getInfo.loginInfo[getInfo.loginInfo.length - 2].time)
+        $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate + getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
         console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
+        if (getInfo.loginInfo[getInfo.loginInfo.length - 2].mobile)
+            $('#deviceLogo').attr("src", "res/smartphone.png");
+        else
+            $('#deviceLogo').attr("src", "res/computer.png");
         $('.toast').toast('show');
     }
     catch (error) {
@@ -313,14 +338,14 @@ async function main() {
     document.getElementById('myChart2').style.display = 'block';
     document.getElementById('myChart3').style.display = 'block';
     data = data['Data']
-    let lineX = [];
-    let lineY = [];
+    // lineX ;
+    // lineY ;
     let lineType = []
 
     lineX = Object.keys(groupBy(data, 'dateOnly'));
     // console.log(lineX);
     // console.log(groupBy(lineX, 'dateOnly'));
-    let totalAmountList = []
+    // totalAmountList = []
     for (let i = 0; i < lineX.length; i++) {
         let a = groupBy(data, 'dateOnly')[lineX[i]]
         // console.log(a);
@@ -348,20 +373,20 @@ async function main() {
     getSummary(data);
     // let priceArray = []
     // let typeArray = []
-    let priceTypeObj = {};
-    for (let i = 0; i < data.length; i++) {
-        // typeArray.push(data[i].type)
-        // priceArray.push(data[i].price);
-        if (data[i].type != 'credit') {
-            if (!priceTypeObj[data[i].type])
-                priceTypeObj[data[i].type] = data[i].price;
-            else
-                priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
-        }
-    }
-    console.log(priceTypeObj);
+    let priceTypeObj = priceTypeFunction(data);
+    // for (let i = 0; i < data.length; i++) {
+    //     // typeArray.push(data[i].type)
+    //     // priceArray.push(data[i].price);
+    //     if (data[i].type != 'credit') {
+    //         if (!priceTypeObj[data[i].type])
+    //             priceTypeObj[data[i].type] = data[i].price;
+    //         else
+    //             priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
+    //     }
+    // }
+    // console.log(priceTypeObj);
 
-    const myChart1 = new Chart(ctx1, {
+    myChart1 = new Chart(ctx1, {
         options: {
             responsive: true,
         },
@@ -401,7 +426,7 @@ async function main() {
     })
     // console.log(Array(Object.values(priceTypeObj).length).fill(Object.values(priceTypeObj).reduce((a, b) => a + b, 0) / Object.values(priceTypeObj).length))
 
-    const myChart2 = new Chart(ctx2, {
+    myChart2 = new Chart(ctx2, {
         type: 'doughnut',
         options: {
             responsive: true,
@@ -432,7 +457,13 @@ async function main() {
         }
 
     })
-
+    document.getElementById('addData').addEventListener('click', () => {
+        console.log(myChart3.data.labels);
+        console.log(myChart3.data.datasets);
+        // myChart3.data.labels=['aman','aanchal']
+        // myChart3.data.datasets[0].data=[210,100]
+        // myChart3.update();
+    })
     for (let i of Object.keys(priceTypeObj)) {
         option = $(`<option value="${i}">${i}</option>`)
         $('#types').append(option)
@@ -470,136 +501,192 @@ async function main() {
     let yLabel = data.map(obj => obj.currentAmount)
     let typeName = data.map(obj => obj.type)
 
-    // console.log(names);
-    const myChart3 = new Chart(ctx3, {
-        type: 'line',
-        data: {
-            labels: lineX,
-            datasets: [{
-                pointStyle: 'circle',
-                radius: 6,
-                hoverRadius: 10,
-                backgroundColor: '#ff6384',
-                // fill: {
+    // console.log(lineX, lineY, totalAmountList);
+    // myChart3 = new Chart(ctx3, {
+    //     type: 'line',
+    //     data: {
+    //         labels: lineX,
+    //         datasets: [{
+    //             pointStyle: 'circle',
+    //             radius: 6,
+    //             hoverRadius: 10,
+    //             backgroundColor: '#ff6384',
+    //             // fill: {
 
-                //     target: 'origin',
-                //     above: '#ff6384',   // Area will be red above the origin
-                //     below: '#ff6384'    // And blue below the origin
-                // },
-                label: 'Price',
-                data: lineY,
-                borderColor: '#ff6384'  //#36a2eb
-                // borderColor:
-                //                 function(context) {
-                //                     // console.log(context.raw);
+    //             //     target: 'origin',
+    //             //     above: '#ff6384',   // Area will be red above the origin
+    //             //     below: '#ff6384'    // And blue below the origin
+    //             // },
+    //             label: 'Price',
+    //             data: lineY,
+    //             borderColor: '#ff6384'  //#36a2eb
+    //             // borderColor:
+    //             //                 function(context) {
+    //             //                     // console.log(context.raw);
 
-                //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-                //                     // console.log(bordercolor);
-                //                     return {
-                //                         borderColor: bordercolor,
-                // }}}]
-            }, {
+    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+    //             //                     // console.log(bordercolor);
+    //             //                     return {
+    //             //                         borderColor: bordercolor,
+    //             // }}}]
+    //         }, {
 
-                pointStyle: 'line',
-                radius: 6,
-                hoverRadius: 10,
-                backgroundColor: 'blue',
-                // fill: {
+    //             pointStyle: 'line',
+    //             radius: 6,
+    //             hoverRadius: 10,
+    //             backgroundColor: 'blue',
+    //             // fill: {
 
-                //     target: 'origin',
-                //     above: '#ff6384',   // Area will be red above the origin
-                //     below: '#ff6384'    // And blue below the origin
-                // },
-                label: 'Price',
-                data: [300, 100],
-                borderColor: '#36a2eb'  //
-                // borderColor:
-                //                 function(context) {
-                //                     // console.log(context.raw);
+    //             //     target: 'origin',
+    //             //     above: '#ff6384',   // Area will be red above the origin
+    //             //     below: '#ff6384'    // And blue below the origin
+    //             // },
+    //             label: 'Price',
+    //             data: totalAmountList,
+    //             borderColor: '#36a2eb'  //
+    //             // borderColor:
+    //             //                 function(context) {
+    //             //                     // console.log(context.raw);
 
-                //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-                //                     // console.log(bordercolor);
-                //                     return {
-                //                         borderColor: bordercolor,
-                // }}}]
+    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+    //             //                     // console.log(bordercolor);
+    //             //                     return {
+    //             //                         borderColor: bordercolor,
+    //             // }}}]
 
-            }, {
-
-
-                pointStyle: 'circle',
-                radius: 6,
-                hoverRadius: 10,
-                backgroundColor: '#36a2eb',
-                // fill: {
-
-                //     target: 'origin',
-                //     above: '#ff6384',   // Area will be red above the origin
-                //     below: '#ff6384'    // And blue below the origin
-                // },
-                label: 'Price',
-                data: [300, 100],
-                borderColor: '#36a2eb'  //
-                // borderColor:
-                //                 function(context) {
-                //                     // console.log(context.raw);
-
-                //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-                //                     // console.log(bordercolor);
-                //                     return {
-                //                         borderColor: bordercolor,
-                // }}}]
+    //             // }, {
 
 
-            }]
-        },
-        options: {
+    //             //     pointStyle: 'circle',
+    //             //     radius: 6,
+    //             //     hoverRadius: 10,
+    //             //     backgroundColor: '#36a2eb',
+    //             // fill: {
 
-            responsive: true,
+    //             //     target: 'origin',
+    //             //     above: '#ff6384',   // Area will be red above the origin
+    //             //     below: '#ff6384'    // And blue below the origin
+    //             // },
+    //             // label: 'Price',
+    //             // data: [300, 100],
+    //             // borderColor: '#36a2eb'  //
+    //             // borderColor:
+    //             //                 function(context) {
+    //             //                     // console.log(context.raw);
 
-            plugins: {
-                tooltip: {
-                    cornerRadius: 6,
-                    backgroundColor: '#ff6384',
-                    titleColor: '#000000',
-                    borderColor: '#ff6384',
-                    usePointStyle: false,
-                    borderWidth: 2,
-                    callbacks: {
-                        title: function (t, d) {
-                            // console.log(t, d);
-                            return "Today's:$ " + lineY[t[0].dataIndex];
-                        },
-                        label: function (t, d) {
+    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
+    //             //                     // console.log(bordercolor);
+    //             //                     return {
+    //             //                         borderColor: bordercolor,
+    //             // }}}]
 
-                            return lineType[t.dataIndex] + ' Total: ' + totalAmountList[t.dataIndex];
-                        },
-                        // labelColor: function (context) {
 
-                        //     let bordercolor = context.raw > 0 ? 'lightgreen' : 'black';
-                        //     return {
-                        //         borderColor: bordercolor,
-                        //         backgroundColor: 'rgb(255,0,0)',
-                        //         // color:'#000000',
-                        //         borderWidth: 2,
-                        //         borderDash: [2, 2],
-                        //         borderRadius: 2,
-                        //     };
-                        // },
-                        borderColor: '#ff6384',
-                        labelTextColor: function (context) {
-                            return '#000000';
-                        }
-                    },
+    //         }]
+    //     },
+    //     options: {
 
-                }
-            }
-        }
-    })
+    //         responsive: true,
+
+    //         plugins: {
+    //             tooltip: {
+    //                 cornerRadius: 6,
+    //                 backgroundColor: '#ff6384',
+    //                 titleColor: '#000000',
+    //                 borderColor: '#ff6384',
+    //                 usePointStyle: false,
+    //                 borderWidth: 2,
+    //                 callbacks: {
+    //                     title: function (t, d) {
+    //                         // console.log(t, d);
+    //                         return "Today's:$ " + lineY[t[0].dataIndex];
+    //                     },
+    //                     label: function (t, d) {
+
+    //                         return lineType[t.dataIndex] + ' Total: ' + totalAmountList[t.dataIndex];
+    //                     },
+    //                     // labelColor: function (context) {
+
+    //                     //     let bordercolor = context.raw > 0 ? 'lightgreen' : 'black';
+    //                     //     return {
+    //                     //         borderColor: bordercolor,
+    //                     //         backgroundColor: 'rgb(255,0,0)',
+    //                     //         // color:'#000000',
+    //                     //         borderWidth: 2,
+    //                     //         borderDash: [2, 2],
+    //                     //         borderRadius: 2,
+    //                     //     };
+    //                     // },
+    //                     borderColor: '#ff6384',
+    //                     labelTextColor: function (context) {
+    //                         return '#000000';
+    //                     }
+    //                 },
+
+    //             }
+    //         }
+    //     }
+    // })
+
+
+
     // console.log(myChart3.data.datasets);
     // console.log(myChart3.data.labels);
+    // }
+    let lineDD = {
+        labels: lineX,
+        datasets: [
+            {
+                label: 'Total: ',
+                data: totalAmountList,
+                borderColor: '#36a2eb',
+                // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
+                yAxisID: 'y',
+            },
+            {
+                label: 'Expenditure: ',
+                data: lineY,
+                borderColor: '#ff6384',
+                // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
+                yAxisID: 'y1',
+            }
+        ]
+    };
+    myChart3 = new Chart(ctx3, {
+        type: 'line',
+        data:lineDD,
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            stacked: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Chart.js Line Chart - Multi Axis'
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+
+                    // grid line settings
+                    grid: {
+                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                    },
+                },
+            }
+        },
+    })
 }
-
-
 
 window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
