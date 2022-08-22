@@ -4,9 +4,10 @@ const ctx3 = document.getElementById('myChart3').getContext('2d');
 let myChart1;
 let myChart2;
 let myChart3;
-let lineX= [];
-let lineY= [];
-let totalAmountList=[];
+let lineX = [];
+let lineY = [];
+let lineType;
+let totalAmountList = [];
 
 const firebaseConfig = {
     apiKey: "AIzaSyAHMHAHTCMnkxL_N2zLyA52QliQtk5jaqQ",
@@ -31,6 +32,7 @@ const db = firebase.firestore();
 // })
 
 function groupBy(objectArray, property) {
+    // console.log(objectArray);
     return objectArray.reduce((acc, obj) => {
         const key = obj[property];
         if (!acc[key]) {
@@ -52,7 +54,7 @@ async function setData() {
     // let lineY;
     let currentAmount;
     let objArray = getInfo;
-    console.log(objArray);
+    // console.log(objArray);
     date = new Date();
     let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
     let dateOnly = date.toDateString().substring(4)
@@ -66,9 +68,9 @@ async function setData() {
     if (Object.keys(objArray).length === 1) {
 
         // $("#inlineRadio2").prop("checked", true);
-        console.log('111..');
+        // console.log('111..');
         let price = Number(amount = document.getElementById('amount-no').value)
-        console.log("undefin", objArray); // put the credit first
+        // console.log("undefin", objArray); // put the credit first
         objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: Number(document.getElementById('amount-no').value), dateTime: dateString }]
 
     }
@@ -114,7 +116,7 @@ async function setData() {
             else {
 
                 document.getElementById("saveBtn").disabled = true;
-
+                totalAmountList.push(currentAmount)
                 objArray['Data'].push({
                     "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
                 })
@@ -140,10 +142,11 @@ async function setData() {
         myChart1.data.datasets[1].data = Array(Object.values(piepriceType).length).fill(Object.values(piepriceType).reduce((a, b) => a + b, 0) / Object.values(piepriceType).length)
         myChart1.update();
 
+        chartData(objArray.Data)
         myChart3.data.labels = lineX
         myChart3.data.datasets[0].data = totalAmountList
         myChart3.data.datasets[1].data = lineY
-        console.log(lineX,lineY,totalAmountList);
+        console.log(lineX, lineY, totalAmountList);
         myChart3.update();
     }
 
@@ -158,6 +161,19 @@ async function setData() {
         })
 
 }
+
+function drawTable(){
+    let headers=['Product','Price','Total Amount','Date']
+    let thead=$('thead')
+    let tbody=$('tbody')
+    let tr=$('<tr></tr>')
+    let th=$('<th></th>')
+
+
+
+}
+
+
 function creditCheck() {
     document.getElementById('types').disabled = true
     document.getElementById('type-name').disabled = true
@@ -283,6 +299,34 @@ function priceTypeFunction(dataArray) {
     return priceTypeObj
 }
 // $( document ).ready(function() {
+    function chartData(data) {
+        lineX=[]
+        lineType=[]
+        lineY=[]
+        totalAmountList=[]
+        lineX = Object.keys(groupBy(data, 'dateOnly'));
+        // totalAmountList = []
+        for (let i = 0; i < lineX.length; i++) {
+            let a = groupBy(data, 'dateOnly')[lineX[i]]
+            // console.log(a);
+            let sum = 0
+            let strType = '';
+            let lowDebit = Infinity;
+            for (let j = 0; j < a.length; j++) {
+                if (a[j].type !== 'credit') {
+                    sum += a[j].price
+                    if (lowDebit > a[j].currentAmount)
+                        lowDebit = a[j].currentAmount
+                    strType += ' ' + a[j].type
+                }
+                // console.log(data[i],sum)
+            }
+            totalAmountList.push(a.slice(-1)[0].currentAmount)
+            // console.log('aman',a.slice(-1)[0].currentAmount);
+            lineY.push(sum)
+            lineType.push(strType)
+        }
+    }
 async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
@@ -293,7 +337,7 @@ async function main() {
 
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
-    console.log(data.loginInfo)
+    // console.log(data.loginInfo)
     // setDeviceInfo();
 
     if (Object.keys(data).length == 1) {
@@ -323,7 +367,7 @@ async function main() {
         $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
 
         $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate + getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
-        console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
+        // console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
         if (getInfo.loginInfo[getInfo.loginInfo.length - 2].mobile)
             $('#deviceLogo').attr("src", "res/smartphone.png");
         else
@@ -340,31 +384,33 @@ async function main() {
     data = data['Data']
     // lineX ;
     // lineY ;
-    let lineType = []
-
-    lineX = Object.keys(groupBy(data, 'dateOnly'));
-    // console.log(lineX);
-    // console.log(groupBy(lineX, 'dateOnly'));
-    // totalAmountList = []
-    for (let i = 0; i < lineX.length; i++) {
-        let a = groupBy(data, 'dateOnly')[lineX[i]]
-        // console.log(a);
-        let sum = 0
-        let strType = '';
-        let lowDebit = Infinity;
-        for (let j = 0; j < a.length; j++) {
-            if (a[j].type !== 'credit') {
-                sum += a[j].price
-                if (lowDebit > a[j].currentAmount)
-                    lowDebit = a[j].currentAmount
-                strType += ' ' + a[j].type
-            }
-            // console.log(data[i],sum)
-        }
-        totalAmountList.push(lowDebit)
-        lineY.push(sum)
-        lineType.push(strType)
-    }
+    lineType = []
+    //     lineX = Object.keys(groupBy(data, 'dateOnly'));
+    //     // console.log(lineX);
+    //     // console.log(groupBy(lineX, 'dateOnly'));
+    //     // totalAmountList = []
+    //     for (let i = 0; i < lineX.length; i++) {
+    //         let a = groupBy(data, 'dateOnly')[lineX[i]]
+    //         // console.log(a);
+    //         let sum = 0
+    //         let strType = '';
+    //         let lowDebit = Infinity;
+    //         for (let j = 0; j < a.length; j++) {
+    //             if (a[j].type !== 'credit') {
+    //                 sum += a[j].price
+    //                 if (lowDebit > a[j].currentAmount)
+    //                     lowDebit = a[j].currentAmount
+    //                 strType += ' ' + a[j].type
+    //             }
+    //             // console.log(data[i],sum)
+    //         }
+    //         totalAmountList.push(a.slice(-1)[0].currentAmount)
+    //         // console.log('aman',a.slice(-1)[0].currentAmount);
+    //         lineY.push(sum)
+    //         lineType.push(strType)
+    //     }
+// console.log(data);
+    chartData(data)
     // console.log(lineY, lineX);
     // console.log(lineType);
 
@@ -458,8 +504,6 @@ async function main() {
 
     })
     document.getElementById('addData').addEventListener('click', () => {
-        console.log(myChart3.data.labels);
-        console.log(myChart3.data.datasets);
         // myChart3.data.labels=['aman','aanchal']
         // myChart3.data.datasets[0].data=[210,100]
         // myChart3.update();
@@ -632,6 +676,7 @@ async function main() {
     // console.log(myChart3.data.datasets);
     // console.log(myChart3.data.labels);
     // }
+    // console.log(lineX, lineY, totalAmountList);
     let lineDD = {
         labels: lineX,
         datasets: [
@@ -640,20 +685,19 @@ async function main() {
                 data: totalAmountList,
                 borderColor: '#36a2eb',
                 // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
-                yAxisID: 'y',
             },
             {
+                type: 'line',
                 label: 'Expenditure: ',
                 data: lineY,
                 borderColor: '#ff6384',
                 // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
-                yAxisID: 'y1',
             }
         ]
     };
     myChart3 = new Chart(ctx3, {
         type: 'line',
-        data:lineDD,
+        data: lineDD,
         options: {
             responsive: true,
             interaction: {
@@ -664,26 +708,9 @@ async function main() {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Chart.js Line Chart - Multi Axis'
+                    // text: 'Chart.js Line Chart - Multi Axis'
                 }
             },
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-
-                    // grid line settings
-                    grid: {
-                        drawOnChartArea: false, // only want the grid lines for one axis to show up
-                    },
-                },
-            }
         },
     })
 }
@@ -701,6 +728,7 @@ window.addEventListener("DOMContentLoaded", function () {
     // console.log(this);
     //     })
     main()
+    // $('#transTable').DataTable()
     // }
 });
 
