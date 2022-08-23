@@ -162,14 +162,61 @@ async function setData() {
 
 }
 
-function drawTable(){
-    let headers=['Product','Price','Total Amount','Date']
-    let thead=$('thead')
-    let tbody=$('tbody')
-    let tr=$('<tr></tr>')
-    let th=$('<th></th>')
+function drawTable() {
+    let headers = ['Product', 'Price', 'Total Amount', 'Date']
+    let values = ['type', 'price', 'currentAmount', 'dateTime']
+    let table = $('#transTable')
+    let thead = $('thead')
+    let tbody = $('tbody')
+    let tr = $('<tr></tr>')
+    let th = $('<th></th>')
+    for (let i = 0; i < headers.length; i++) {
+        th = $('<th></th>')
+        th.text(headers[i])
+        tr.append(th)
+    }
+    thead.append(tr)
+    let tableRowData;
+    for (let i = 0; i < getInfo.Data.length; i++) {
+        tr = $('<tr></tr>')
+        tableRowData = getInfo.Data[i]
+        for (let j = 0; j < 4; j++) {
+            td = $('<td></td>')
+            if (j == 0) {
+                if (tableRowData.type == 'credit')
+                    td.text('-')
+                else
+                    td.text(tableRowData[values[j]])
+            }
+            else if (j == 1) {
+                if (tableRowData.type == 'credit') {
+                    td.text(`+${tableRowData[values[j]]}`)
+                    td.css("color", "green");
+                }
+                else {
+                    td.text(`-${tableRowData[values[j]]}`)
+                    td.css("color", "red");
 
+                }
+            }
+            else if (j == 2) {
+                if (tableRowData.type == 'credit') {
+                    td.text(tableRowData[values[j]])
+                }
+                else {
+                    td.text(tableRowData[values[j]])
+                }
+            }
+            else
+                td.text(tableRowData[values[j]])
 
+            tr.append(td)
+        }
+        tbody.append(tr)
+    }
+    table.append(thead)
+    table.append(tbody)
+    // $('#transTable_wrapper').addClass('container')
 
 }
 
@@ -299,38 +346,39 @@ function priceTypeFunction(dataArray) {
     return priceTypeObj
 }
 // $( document ).ready(function() {
-    function chartData(data) {
-        lineX=[]
-        lineType=[]
-        lineY=[]
-        totalAmountList=[]
-        lineX = Object.keys(groupBy(data, 'dateOnly'));
-        // totalAmountList = []
-        for (let i = 0; i < lineX.length; i++) {
-            let a = groupBy(data, 'dateOnly')[lineX[i]]
-            // console.log(a);
-            let sum = 0
-            let strType = '';
-            let lowDebit = Infinity;
-            for (let j = 0; j < a.length; j++) {
-                if (a[j].type !== 'credit') {
-                    sum += a[j].price
-                    if (lowDebit > a[j].currentAmount)
-                        lowDebit = a[j].currentAmount
-                    strType += ' ' + a[j].type
-                }
-                // console.log(data[i],sum)
+function chartData(data) {
+    lineX = []
+    lineType = []
+    lineY = []
+    totalAmountList = []
+    lineX = Object.keys(groupBy(data, 'dateOnly'));
+    // totalAmountList = []
+    for (let i = 0; i < lineX.length; i++) {
+        let a = groupBy(data, 'dateOnly')[lineX[i]]
+        // console.log(a);
+        let sum = 0
+        let strType = '';
+        let lowDebit = Infinity;
+        for (let j = 0; j < a.length; j++) {
+            if (a[j].type !== 'credit') {
+                sum += a[j].price
+                if (lowDebit > a[j].currentAmount)
+                    lowDebit = a[j].currentAmount
+                strType += ' ' + a[j].type
             }
-            totalAmountList.push(a.slice(-1)[0].currentAmount)
-            // console.log('aman',a.slice(-1)[0].currentAmount);
-            lineY.push(sum)
-            lineType.push(strType)
+            // console.log(data[i],sum)
         }
+        totalAmountList.push(a.slice(-1)[0].currentAmount)
+        // console.log('aman',a.slice(-1)[0].currentAmount);
+        lineY.push(sum)
+        lineType.push(strType)
     }
+}
 async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
     await getContent();
+
     document.getElementById('firstL').style.display = 'none';
     document.getElementById('firstS').style.display = 'none';
     document.getElementById('firstT').style.display = 'none';
@@ -338,7 +386,7 @@ async function main() {
     let data = getInfo;
     document.getElementById('gistGIF').style.display = 'none'
     // console.log(data.loginInfo)
-    // setDeviceInfo();
+    setDeviceInfo();
 
     if (Object.keys(data).length == 1) {
         $("#inlineRadio2").prop("checked", true);
@@ -361,6 +409,10 @@ async function main() {
         document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:0 !important')
         document.getElementsByClassName('alert')[0].style.display = 'none'
         $('.noData').hide();
+        drawTable()
+        $('#transTable').DataTable()
+        $('#transTable_wrapper').addClass('container my-5')
+
     }
     // getDeviceInfo();
     try {
@@ -409,7 +461,7 @@ async function main() {
     //         lineY.push(sum)
     //         lineType.push(strType)
     //     }
-// console.log(data);
+    // console.log(data);
     chartData(data)
     // console.log(lineY, lineX);
     // console.log(lineType);
@@ -728,7 +780,6 @@ window.addEventListener("DOMContentLoaded", function () {
     // console.log(this);
     //     })
     main()
-    // $('#transTable').DataTable()
     // }
 });
 

@@ -65,6 +65,9 @@ h1 {
     position: relative !important;
   }
 }
+td,th{
+  text-align: center !important;
+}
 
 .arrow {
   color: white;
