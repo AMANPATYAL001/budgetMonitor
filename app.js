@@ -149,6 +149,25 @@ async function setData() {
         console.log(lineX, lineY, totalAmountList);
         myChart3.update();
     }
+    console.log(lineX, lineY, totalAmountList);
+    updateSummary(lineY.reduce((x, y) => x + y, 0), lineY.length, totalAmountList[totalAmountList.length - 1], objArray.Data);
+    let tr = $('<tr></tr>')
+    let td1;
+    let td2;
+    if (objArray.Data[objArray.Data.length - 1].type == 'credit')
+        td1 = $(`<td>-</td>`)
+    else
+        td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type}</td>`)
+
+    if (objArray.Data[objArray.Data.length - 1].type == 'credit')
+        td2 = $(`<td style="color:green;">+${objArray.Data[objArray.Data.length - 1].price}</td>`)
+    else
+        td2 = $(`<td style="color:red;">-${objArray.Data[objArray.Data.length - 1].price}</td>`)
+
+    let td3 = $(`<td>${objArray.Data[objArray.Data.length - 1].currentAmount}</td>`)
+    let td4 = $(`<td>${objArray.Data[objArray.Data.length - 1].dateTime}</td>`)
+    tr.append(td1).append(td2).append(td3).append(td4)
+    $('table tbody').prepend(tr)
 
     dbUsers.doc(uid).set(objArray).then((para) => {
         // console.log(para)
@@ -159,6 +178,23 @@ async function setData() {
             console.log(err)
             document.getElementById("saveBtn").disabled = false;
         })
+
+}
+
+function updateSummary(a, b, c, data) {
+    let date = new Date()
+    let month = months[date.getMonth()].substring(0, 3)
+    let year = date.getFullYear()
+
+    $('#gistTotal').html(`Current total Amount is $ <strong>${c}</strong>`)
+    $('#gistPrev10').html(`Last ${b} days expenditure sum is $ <strong>${a}</strong>`)
+    let creditMonth = 0;
+    for (let i = data.length - 1; i >= 0; i--) {
+        if (/\w{3}\s/.exec(data[i].dateOnly)[0].trim() == month && /\s\d{4}/.exec(data[i].dateOnly)[0].trim() == year && data[i].type == 'credit') {
+            creditMonth += data[i].price
+        }
+    }
+    $('#gistCreditM').html(`This month's credit is $ <strong>${creditMonth}</strong>`)
 
 }
 
@@ -179,7 +215,7 @@ function drawTable() {
     let tableRowData;
     for (let i = 0; i < getInfo.Data.length; i++) {
         tr = $('<tr></tr>')
-        tableRowData = getInfo.Data[i]
+        tableRowData = getInfo.Data[getInfo.Data.length - 1 - i]
         for (let j = 0; j < 4; j++) {
             td = $('<td></td>')
             if (j == 0) {
@@ -410,7 +446,7 @@ async function main() {
         document.getElementsByClassName('alert')[0].style.display = 'none'
         $('.noData').hide();
         drawTable()
-        $('#transTable').DataTable()
+        $('#transTable').DataTable({ "order": [] })
         $('#transTable_wrapper').addClass('container my-5')
 
     }
@@ -468,7 +504,8 @@ async function main() {
 
     // console.log(data);   // array of objects
     // document.getElementById('gistCard').style.display = 'block'
-    getSummary(data);
+    // getSummary(data);
+    updateSummary(lineY.reduce((x, y) => x + y, 0), lineY.length, totalAmountList[totalAmountList.length - 1], data)
     // let priceArray = []
     // let typeArray = []
     let priceTypeObj = priceTypeFunction(data);
@@ -773,12 +810,14 @@ window.addEventListener("DOMContentLoaded", function () {
 
     // if(main()){getContent
     // console.log('again');
-    //     let hue=0
     //     document.getElementById('titleBM').addEventListener('onmouseover',function (){
-    //         hue+=Math.floor(Math.random() *15);
-    //         this.style.color='hsl('+hue+',100%,50%)';
     // console.log(this);
     //     })
+    let hue = 0
+    window.addEventListener('scroll', () => {
+        hue += Math.floor(Math.random() * 15);
+        this.document.getElementById('titleBM').style.color = 'hsl(' + hue + ',100%,50%)';
+    })
     main()
     // }
 });
