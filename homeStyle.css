@@ -8,7 +8,11 @@ body {
     height: 100%;
 }
 
-#loginGIF{
+#loginGIF {
+    display: none;
+}
+
+#signupGIF {
     display: none;
 }
 
@@ -40,22 +44,37 @@ body {
     bottom: 0px;
     left: 0;
 }
+
 @media screen and (max-width: 950px) {
     #image {
-      content: url("https://images.pexels.com/photos/9822690/pexels-photo-9822690.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+        content: url("https://images.pexels.com/photos/9822690/pexels-photo-9822690.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
     }
 }
 
-@media screen and (min-device-width:400px) and (max-device-width: 620px){
-    #image{
+@media screen and (min-device-width:400px) and (max-device-width: 620px) {
+    #image {
         display: none;
     }
-    .offcanvas-start{
+
+    .offcanvas-start {
         width: 100%;
     }
 }
-@media screen and (orientation:portrait) and (min-device-width: 320px) and (max-device-width: 450px){
+
+@media screen and (orientation:portrait) and (min-device-width: 320px) and (max-device-width: 450px) {
     #image {
         content: url("https://images.pexels.com/photos/9822690/pexels-photo-9822690.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
-      }
+    }
 }
+
+.blinkInput {
+    margin: auto;
+    animation: blink 2s linear 4;
+}
+@keyframes blink{
+    0%   {border: #fffefe solid 2px; }
+  25%  {border: #b2ff59 solid 2px; }
+  50%  {border: #fffefe solid 2px; }
+  75% {border: #b2ff59 solid 2px; }
+  100% {border: #fffefe solid 2px; }
+  }

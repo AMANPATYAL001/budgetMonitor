@@ -321,9 +321,12 @@ function setDeviceInfo() {
     if (!getInfo.loginInfo) {
         getInfo['loginInfo'] = [loginData]
     }
-    else
+    else{
         getInfo.loginInfo.push(loginData)
-
+        if(getInfo.loginInfo.length>10)
+        getInfo.loginInfo.splice(0,getInfo.loginInfo.length-10)
+        console.log(getInfo.loginInfo);
+    }
     dbUsers.doc(uid).set(getInfo).then((para) => {
         document.getElementById("saveBtn").disabled = false;
     })
@@ -414,7 +417,9 @@ async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
     await getContent();
-
+    $('#addData').attr('href','');
+    $('#offCan').attr('href','');
+    $('#logOut').attr('href','');
     document.getElementById('firstL').style.display = 'none';
     document.getElementById('firstS').style.display = 'none';
     document.getElementById('firstT').style.display = 'none';
@@ -454,7 +459,7 @@ async function main() {
     try {
         $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
 
-        $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate + getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
+        $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate +' '+ getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
         // console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
         if (getInfo.loginInfo[getInfo.loginInfo.length - 2].mobile)
             $('#deviceLogo').attr("src", "res/smartphone.png");
@@ -806,6 +811,14 @@ async function main() {
 
 window.addEventListener("DOMContentLoaded", function () {
     document.getElementById("gifLoader").style.display = "none";
+    $('#addData').removeAttr('href');
+    $('#offCan').removeAttr('href');
+    $('#logOut').removeAttr('href');
+    if(localStorage.length==0){
+        $('.noLogin').show();
+        return false;
+    }
+    console.log('asasa');
     document.getElementById("wrapper").style.display = "block";
 
     // if(main()){getContent
@@ -813,6 +826,12 @@ window.addEventListener("DOMContentLoaded", function () {
     //     document.getElementById('titleBM').addEventListener('onmouseover',function (){
     // console.log(this);
     //     })
+    document.getElementById('logOut').addEventListener('click',()=>{
+        localStorage.removeItem('UID')
+        location.href = 'index.html';
+
+    })
+    
     let hue = 0
     window.addEventListener('scroll', () => {
         hue += Math.floor(Math.random() * 15);
