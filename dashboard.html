@@ -28,21 +28,23 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                     <a class="nav-link active" data-bs-toggle="modal" href="" data-bs-target="#exampleModal"
-                    id="addData">Add+</a>
+                        id="addData">Add+</a>
                     <a class="nav-link active" href="" id="offCan" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Quick
-                    Look👀</a>
-                    <a class="nav-link active" id="logOut" aria-current="page" href="">Logout</a>
+                        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Quick
+                        Look👀</a>
+                    <button type="button" class="btn" id="logOut">Logout</button>
                 </div>
             </div>
         </div>
     </nav>
     <img src="res/Magnify-1s-200px.gif" id="gifLoader" style="width:150px;height:auto;">
-    
-    <img class="noLogin" src="https://cdn.dribbble.com/users/1665077/screenshots/10738715/media/90712c2d7fd869e9d7586a108024d62c.gif">
-    <br>
-    <img class="noLogin" src="res/Vanilla-1s-280px.gif">
-
+    <div class="container">
+        <img class="noLogin"
+            src="https://cdn.dribbble.com/users/1665077/screenshots/10738715/media/90712c2d7fd869e9d7586a108024d62c.gif">
+        <br>
+        <img class="noLogin" src="res/Vanilla-1s-280px.gif">
+        <button type="button" class="btn btn-info btn-lg" id="noLoginBtn">Home Page</button>
+    </div>
     <div id="wrapper">
         <!-- <div class="alert alert-warning alert-dismissible fade container" style="display:none;" role="alert">
             <strong>One MORE</strong> entry will look good.
@@ -228,7 +230,8 @@
         </div> -->
 
         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="10000">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+                data-bs-delay="10000">
                 <div class="toast-header">
                     <img src="res/smartphone.png" id="deviceLogo" class="rounded me-2" alt="...">
                     <strong class="me-auto">Last login in</strong>

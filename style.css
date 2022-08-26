@@ -23,12 +23,21 @@ h1 {
 }
 
 .noLogin {
-  position: fixed;
+  /* position: fixed; */
   display: none;
-  left: calc(40%);
-  top: calc(40%);
+  /* margin-left: auto;
+  margin-right: auto; */
+  /* top: calc(20%); */
   /* width: 100%; */
   height: 300px;
+  /* z-index: 9999; */
+}
+#noLoginBtn {
+  /* position: fixed; */
+  display: none;
+  /* left: calc(42%);
+  top: calc(50%); */
+  /* width: 100%; */
   /* z-index: 9999; */
 }
 
@@ -70,6 +79,14 @@ h1 {
   .noLogin{
     height: 150px;
   }
+  /* #noLoginBtn {
+    position: fixed;
+    display: none;
+    left: calc(40%);
+    top: calc(65%);
+    /* width: 100%; 
+    /* z-index: 9999; 
+  } */
 }
 
 @media screen and (max-width: 990px) {

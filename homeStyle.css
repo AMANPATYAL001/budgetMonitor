@@ -72,9 +72,9 @@ body {
     animation: blink 2s linear 4;
 }
 @keyframes blink{
-    0%   {border: #fffefe solid 2px; }
+    0%   {border: #fffefe solid 3px; }
   25%  {border: #b2ff59 solid 2px; }
-  50%  {border: #fffefe solid 2px; }
+  50%  {border: #fffefe solid 3px; }
   75% {border: #b2ff59 solid 2px; }
-  100% {border: #fffefe solid 2px; }
+  100% {border: #fffefe solid 3px; }
   }

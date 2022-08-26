@@ -26,6 +26,8 @@ document.getElementById('signUpBtn').addEventListener('click', () => {
     if (info[1] !== info[2]) {
         document.getElementById('passwordSignUpHelp').style.display = 'block';
         document.getElementById('passwordSignUpHelp').innerText = 'Unmatched Passwords';
+        document.getElementById("signUpBtn").disabled = false;
+        document.getElementById('signupGIF').style.display = 'none';
         console.log('unmatched');
         return;
     }
@@ -131,7 +133,8 @@ function validateSignUpEmail() {
 
 document.getElementById('signUpInputEmail').addEventListener('input', validateSignUpEmail)
 document.getElementById('InputEmail').addEventListener("input", validateEmail);
-document.getElementById('signUpConfirmInputPassword').addEventListener("input", validateSignUpEmail);
+// document.getElementById('signUpConfirmInputPassword').addEventListener("input", validateSignUpEmail);
+$('.passwordChange').on('input propertychange',validateSignUpEmail);
 
 function changeBackground() {
     let li = ['https://img.freepik.com/free-vector/happy-rich-banker-celebrating-income-growth_74855-5867.jpg?w=1380&t=st=1660213809~exp=1660214409~hmac=4ddd4f0742304ff9729e43b83caa2ea36b29c5b0e5fb91005fa274973b0f4bf8', 'https://img.freepik.com/free-vector/family-couple-saving-money_74855-5240.jpg?w=1800&t=st=1660213703~exp=1660214303~hmac=48f9a5f0b5159d57416a668056cb3bc4cd18a342395ff0a09fe6978e6f41aceb', 'https://img.freepik.com/free-vector/woman-investing-getting-profit_74855-11229.jpg?w=1380&t=st=1660214471~exp=1660215071~hmac=ecd303135823f537883a99a7f58ba96b60fe26b54633af80b816b5ea58c51088', 'https://img.freepik.com/premium-vector/tiny-people-putting-clocks-money-box-flat-vector-illustration-time-turning-into-finance-income-women-men-taking-care-work-organization-planning-tasks-business-time-management-concept_74855-22575.jpg?w=1380', 'https://img.freepik.com/free-vector/social-support-concept-residents-getting-basic-benefits-from-government_74855-11060.jpg?w=1380&t=st=1660837068~exp=1660837668~hmac=34641c77c09df802b46b3a8bc2e489162d33dd732339a90c51f61f5dbeb17963', 'https://img.freepik.com/premium-vector/hand-giving-money-entrepreneurs-local-shopkeepers-tiny-people-shop-owners-receiving-loan-flat-vector-illustration-small-business-support-collateral-financial-help-subsidy-concept_74855-21134.jpg?w=1380']
