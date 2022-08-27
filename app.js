@@ -147,10 +147,8 @@ async function setData() {
         myChart3.data.labels = lineX
         myChart3.data.datasets[0].data = totalAmountList
         myChart3.data.datasets[1].data = lineY
-        console.log(lineX, lineY, totalAmountList);
         myChart3.update();
     }
-    console.log(lineX, lineY, totalAmountList);
     updateSummary(lineY.reduce((x, y) => x + y, 0), lineY.length, totalAmountList[totalAmountList.length - 1], objArray.Data);
     dbUsers.doc(uid).set(objArray).then((para) => {
         if ($('table tbody tr').length != 0) {
@@ -209,10 +207,14 @@ function dataAdded(dd) {
         return false
     }
     else {
-        console.log(dd);
         try {
             document.getElementsByClassName('alert')[0].setAttribute('style', 'opacity:0 !important')
             document.getElementsByClassName('alert')[0].style.display = 'none'
+            if (!$('#transTable_wrapper').hasClass('container')) {
+                drawTable()
+                $('#transTable').DataTable({ "order": [] })
+                $('#transTable_wrapper').addClass('container my-5')
+            }
         }
         catch {
         }
@@ -244,6 +246,7 @@ function updateSummary(a, b, c, data) {
 }
 
 function drawTable() {
+    var dateFormat = require('dateformat');
     let headers = ['Product', 'Price', 'Total Amount', 'Date']
     let values = ['type', 'price', 'currentAmount', 'dateTime']
     let table = $('#transTable')
@@ -267,7 +270,7 @@ function drawTable() {
                 if (tableRowData.type == 'credit')
                     td.text('-')
                 else
-                    td.text(tableRowData[values[j]])
+                    td.text(tableRowData[values[j]][0].toUpperCase() + tableRowData[values[j]].substring(1))
             }
             else if (j == 1) {
                 if (tableRowData.type == 'credit') {
@@ -289,7 +292,7 @@ function drawTable() {
                 }
             }
             else
-                td.text(tableRowData[values[j]])
+                td.text(tableRowData[values[j]].replace(/\d{4}\s/, ''));
 
             tr.append(td)
         }
@@ -502,6 +505,26 @@ function createChart(data) {
     //             priceTypeObj[data[i].type] = priceTypeObj[data[i].type] + data[i].price;
     //     }
     // }
+    const chartColors = {
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(201, 203, 207, 0.2)'
+        ],
+        borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(201, 203, 207)'
+        ]
+    }
     myChart1 = new Chart(ctx1, {
         options: {
             responsive: true,
@@ -509,27 +532,12 @@ function createChart(data) {
         data: {
             datasets: [{
                 type: 'bar',
-                label: 'Bar Dataset',
+                label: 'Product',
                 data: Object.values(priceTypeObj),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(255, 205, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(201, 203, 207, 0.2)'
-                ],
-                borderColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(255, 159, 64)',
-                    'rgb(255, 205, 86)',
-                    'rgb(75, 192, 192)',
-                    'rgb(54, 162, 235)',
-                    'rgb(153, 102, 255)',
-                    'rgb(201, 203, 207)'
-                ],
-                borderWidth: 1
+                backgroundColor: chartColors['backgroundColor'],
+                borderColor: chartColors['borderColor'],
+                borderWidth: 1,
+                hoverBorderWidth:3,
             }, {
                 type: 'line',
                 label: 'Average Price',
@@ -549,24 +557,12 @@ function createChart(data) {
         data: {
             labels: Object.keys(priceTypeObj),
             datasets: [{
-                label: 'Average Price',
+                hoverOffset: 10,
+                hoverBorderWidth:3,
+                // label: 'Average Price',
                 data: Object.values(priceTypeObj),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
+                backgroundColor: chartColors['backgroundColor'],
+                borderColor: chartColors['borderColor'],
                 borderWidth: 1
             }]
         }
@@ -744,12 +740,14 @@ function createChart(data) {
         labels: lineX,
         datasets: [
             {
+                hoverBorderWidth:10,
                 label: 'Total: ',
                 data: totalAmountList,
                 borderColor: '#36a2eb',
                 // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
             },
             {
+                hoverBorderWidth:10,
                 type: 'line',
                 label: 'Expenditure: ',
                 data: lineY,
@@ -1185,12 +1183,12 @@ window.addEventListener("DOMContentLoaded", function () {
     $('#addData').removeAttr('href');
     $('#offCan').removeAttr('href');
     $('#logOut').removeAttr('href');
-    this.document.getElementById('noLoginBtn').addEventListener('click',()=>{
-        location.href='index.html'
+    this.document.getElementById('noLoginBtn').addEventListener('click', () => {
+        location.href = 'index.html'
     })
     if (localStorage.getItem('UID') == null) {
         $('.noLogin').show(1000);
-        $('#noLoginBtn').show(10);        
+        $('#noLoginBtn').show(10);
         return false;
     }
     document.getElementById("wrapper").style.display = "block";
