@@ -9,6 +9,8 @@ let lineY = [];
 let lineType;
 let totalAmountList = [];
 let chartExist = false;
+const container = document.getElementById("exampleModal");
+const modal = new bootstrap.Modal(container);
 
 const firebaseConfig = {
     apiKey: "AIzaSyAHMHAHTCMnkxL_N2zLyA52QliQtk5jaqQ",
@@ -60,19 +62,72 @@ async function setData() {
     let dateString = `${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()} ${date.toLocaleTimeString()}`;
     let dateOnly = date.toDateString().substring(4)
     let DoC;
+    let amount = document.getElementById('amount-no').value
+    let type;
+    let dropDownTypeVal = $('#types').val()
+    let inpTypeVal = $('#type-name').val().toLowerCase()
+
+    if (inpTypeVal.trim() == 'credit') {
+        document.getElementById('typeHelpD').innerText = "can't set debit as 'CREDIT' type"
+        return
+    }
     if ($('#inlineRadio1').is(':checked')) {
         DoC = 'debit'
     }
     else
         DoC = 'credit'
+
+    if (DoC == 'debit') {
+        currentAmount = currentAmount - amount
+        if (inpTypeVal.trim() == '')
+            type = dropDownTypeVal
+        else
+            type = inpTypeVal
+    }
+    else {
+        currentAmount = currentAmount + Number(amount)
+
+        // amount = 0;
+        // type = 'credit'  //currentAmount
+
+    }
+
+
+    if (Number(amount)) {
+        if (Number(amount) <= 10 && DoC == 'debit') {
+            document.getElementById('amountHelp').innerText = 'Amount less than 10 not acceptable'
+            return
+        }
+        else {
+            amount = Number(amount);
+            // document.getElementById("saveBtn").disabled = true;
+            // totalAmountList.push(currentAmount)
+            // objArray['Data'].push({
+            //     "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
+            // })
+            // console.log(objArray['Data']);
+
+        }
+
+    }
+    else {
+        document.getElementById('amountHelp').innerText = 'Invalid Amount'
+        return
+    }
+
+    // if ($('#inlineRadio1').is(':checked')) {
+    //     DoC = 'debit'
+    // }
+    // else
+    //     DoC = 'credit'
     // console.log(objArray,' objArray');
     if (Object.keys(objArray).length === 1) {
 
         // $("#inlineRadio2").prop("checked", true);
         // console.log('111..');
-        let price = Number(amount = document.getElementById('amount-no').value)
+        // let price = Number(amount)
         // console.log("undefin", objArray); // put the credit first
-        objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', price: price, currentAmount: Number(document.getElementById('amount-no').value), dateTime: dateString }]
+        objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', amount:  Number(amount), currentAmount: Number(amount), dateTime: dateString }]
 
     }
     else {
@@ -84,52 +139,42 @@ async function setData() {
         }
 
 
-        let DoC;
-        if ($('#inlineRadio1').is(':checked')) {
-            DoC = 'debit'
-        }
-        else
-            DoC = 'credit'
-        let amount;
-        let type;
-        let dropDownTypeVal = $('#types').val()
-        let inpTypeVal = $('#type-name').val()
-        amount = document.getElementById('amount-no').value
-        if (inpTypeVal.trim().toLowerCase() == 'income')
-            document.getElementById('typeHelpD').innerText = "can't set debit as 'INCOME' type"
-        if (DoC == 'debit') {
-            currentAmount = currentAmount - amount
-            if (inpTypeVal.trim() == '')
-                type = dropDownTypeVal
-            else
-                type = inpTypeVal
-        }
-        else {
-            currentAmount = currentAmount + Number(amount)
+        // let DoC;
+        // if ($('#inlineRadio1').is(':checked')) {
+        //     DoC = 'debit'
+        // }
+        // else
+        //     DoC = 'credit'
 
-            // amount = 0;
-            type = 'credit'  //currentAmount
+        // let type;
+        // let dropDownTypeVal = $('#types').val()
+        // let inpTypeVal = $('#type-name').val().toLowerCase()
+        // if (inpTypeVal.trim() == 'credit') {
+        //     document.getElementById('typeHelpD').innerText = "can't set debit as 'CREDIT' type"
+        //     return
+        // }
+        // if (DoC == 'debit') {
+        //     currentAmount = currentAmount - amount
+        //     if (inpTypeVal.trim() == '')
+        //         type = dropDownTypeVal
+        //     else
+        //         type = inpTypeVal
+        // }
+        // else {
+        //     currentAmount = currentAmount + Number(amount)
 
-        }
-        if (Number(amount) == 0 || Number(amount)) {
-            if (Number(amount) <= 10 && type == 'debit')
-                document.getElementById('amountHelp').innerText = 'Amount less than 10 not acceptable'
-            else {
+        //     // amount = 0;
+        //     type = 'credit'  //currentAmount
 
-                document.getElementById("saveBtn").disabled = true;
-                totalAmountList.push(currentAmount)
-                objArray['Data'].push({
-                    "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
-                })
-                // console.log(objArray['Data']);
-
-            }
-
-        }
-        else {
-            document.getElementById('amountHelp').innerText = 'Invalid Amount'
-        }
+        // }
+        document.getElementById("saveBtn").disabled = true;
+        totalAmountList.push(currentAmount)
+        objArray['Data'].push({
+            "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
+        })
+        
     }
+    modal.hide();
     let piepriceType = priceTypeFunction(objArray.Data)
     // console.log(myChart2.data.labels);
     // console.log(myChart2.data.datasets);
@@ -200,7 +245,6 @@ function dataAdded(dd) {
         // $('.noData').show();
         if (!$('#transTable_wrapper').hasClass('container')) {
             drawTable()
-            console.log('table created');
             $('#transTable').DataTable({ "order": [] })
             $('#transTable_wrapper').addClass('container my-5')
         }
@@ -216,7 +260,8 @@ function dataAdded(dd) {
                 $('#transTable_wrapper').addClass('container my-5')
             }
         }
-        catch {
+        catch (e) {
+            console.log('err', e);
         }
         $('.noData').hide();
         if (!chartExist) {
@@ -246,7 +291,6 @@ function updateSummary(a, b, c, data) {
 }
 
 function drawTable() {
-    var dateFormat = require('dateformat');
     let headers = ['Product', 'Price', 'Total Amount', 'Date']
     let values = ['type', 'price', 'currentAmount', 'dateTime']
     let table = $('#transTable')
@@ -321,7 +365,7 @@ document.getElementById('type-name').addEventListener('input', typeInfo)
 
 function typeInfo() {
     let inpTypeVal = $('#type-name').val()
-    if (inpTypeVal.trim() == '' || inpTypeVal.trim().toLowerCase() == 'income')
+    if (inpTypeVal.trim() == '' || inpTypeVal.trim().toLowerCase() == 'credit')
         $('#typeHelpS').text('')
     else
         $('#typeHelpS').text(`'${inpTypeVal}' will be takes as new Type`)
@@ -345,6 +389,7 @@ async function getContent() {
     let uid = localStorage.getItem('UID');
     let dbUsers = await db.collection('users')
     await dbUsers.doc(uid).get().then((para) => {
+        console.log(para);
         getInfo = para.data();
         // return para.data();
     }).catch((err) => {
@@ -364,6 +409,7 @@ function setDeviceInfo() {
         'loginTime': new Date().toTimeString(),
         'mobile': navigator.userAgentData.mobile
     }
+    console.log(getInfo);
     if (!getInfo.loginInfo) {
         getInfo['loginInfo'] = [loginData]
     }
@@ -537,7 +583,7 @@ function createChart(data) {
                 backgroundColor: chartColors['backgroundColor'],
                 borderColor: chartColors['borderColor'],
                 borderWidth: 1,
-                hoverBorderWidth:3,
+                hoverBorderWidth: 3,
             }, {
                 type: 'line',
                 label: 'Average Price',
@@ -558,7 +604,7 @@ function createChart(data) {
             labels: Object.keys(priceTypeObj),
             datasets: [{
                 hoverOffset: 10,
-                hoverBorderWidth:3,
+                hoverBorderWidth: 3,
                 // label: 'Average Price',
                 data: Object.values(priceTypeObj),
                 backgroundColor: chartColors['backgroundColor'],
@@ -574,7 +620,7 @@ function createChart(data) {
         // myChart3.update();
     })
     for (let i of Object.keys(priceTypeObj)) {
-        option = $(`<option value="${i}">${i}</option>`)
+        option = $(`<option value="${i}">${i[0].toUpperCase() + i.substring(1)}</option>`)
         $('#types').append(option)
     }
     // $('#types').change(function () {
@@ -740,14 +786,14 @@ function createChart(data) {
         labels: lineX,
         datasets: [
             {
-                hoverBorderWidth:10,
+                hoverBorderWidth: 10,
                 label: 'Total: ',
                 data: totalAmountList,
                 borderColor: '#36a2eb',
                 // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
             },
             {
-                hoverBorderWidth:10,
+                hoverBorderWidth: 10,
                 type: 'line',
                 label: 'Expenditure: ',
                 data: lineY,
