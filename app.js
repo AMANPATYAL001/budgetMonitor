@@ -78,17 +78,17 @@ async function setData() {
         DoC = 'credit'
 
     if (DoC == 'debit') {
-        currentAmount = currentAmount - amount
+        // currentAmount = currentAmount - amount
         if (inpTypeVal.trim() == '')
             type = dropDownTypeVal
         else
             type = inpTypeVal
     }
     else {
-        currentAmount = currentAmount + Number(amount)
+        // currentAmount = currentAmount + Number(amount)
 
         // amount = 0;
-        // type = 'credit'  //currentAmount
+        type = 'credit'  //currentAmount
 
     }
 
@@ -127,52 +127,38 @@ async function setData() {
         // console.log('111..');
         // let price = Number(amount)
         // console.log("undefin", objArray); // put the credit first
-        objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', amount:  Number(amount), currentAmount: Number(amount), dateTime: dateString }]
+        totalAmountList.push(amount)
+        objArray['Data'] = [{ id: 0, dateOnly: dateOnly, type: 'credit', price: amount, currentAmount: amount, dateTime: dateString }]
 
     }
     else {
         currentAmount = objArray['Data'][objArray['Data'].length - 1].currentAmount
+        if (DoC == 'debit') {
+            currentAmount = currentAmount - amount
+            if (inpTypeVal.trim() == '')
+                type = dropDownTypeVal
+            else
+                type = inpTypeVal
+        }
+        else {
+            currentAmount = currentAmount + Number(amount)
+
+            // amount = 0;
+            type = 'credit'  //currentAmount
+
+        }
         let max = -1;
         for (const iterator of objArray['Data']) {
             if (max < iterator.id)
                 max = iterator.id
         }
 
-
-        // let DoC;
-        // if ($('#inlineRadio1').is(':checked')) {
-        //     DoC = 'debit'
-        // }
-        // else
-        //     DoC = 'credit'
-
-        // let type;
-        // let dropDownTypeVal = $('#types').val()
-        // let inpTypeVal = $('#type-name').val().toLowerCase()
-        // if (inpTypeVal.trim() == 'credit') {
-        //     document.getElementById('typeHelpD').innerText = "can't set debit as 'CREDIT' type"
-        //     return
-        // }
-        // if (DoC == 'debit') {
-        //     currentAmount = currentAmount - amount
-        //     if (inpTypeVal.trim() == '')
-        //         type = dropDownTypeVal
-        //     else
-        //         type = inpTypeVal
-        // }
-        // else {
-        //     currentAmount = currentAmount + Number(amount)
-
-        //     // amount = 0;
-        //     type = 'credit'  //currentAmount
-
-        // }
         document.getElementById("saveBtn").disabled = true;
         totalAmountList.push(currentAmount)
         objArray['Data'].push({
             "id": max + 1, "dateTime": dateString, price: Number(amount), "type": type, 'currentAmount': currentAmount, dateOnly: date.toDateString().substring(4)
         })
-        
+
     }
     modal.hide();
     let piepriceType = priceTypeFunction(objArray.Data)
@@ -194,6 +180,7 @@ async function setData() {
         myChart3.data.datasets[1].data = lineY
         myChart3.update();
     }
+    console.log(totalAmountList);
     updateSummary(lineY.reduce((x, y) => x + y, 0), lineY.length, totalAmountList[totalAmountList.length - 1], objArray.Data);
     dbUsers.doc(uid).set(objArray).then((para) => {
         if ($('table tbody tr').length != 0) {
@@ -203,7 +190,7 @@ async function setData() {
             if (objArray.Data[objArray.Data.length - 1].type == 'credit')
                 td1 = $(`<td>-</td>`)
             else
-                td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type}</td>`)
+                td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type[0].toUpperCase()+objArray.Data[objArray.Data.length - 1].type.substring(1)}</td>`)
 
             if (objArray.Data[objArray.Data.length - 1].type == 'credit')
                 td2 = $(`<td style="color:green;">+${objArray.Data[objArray.Data.length - 1].price}</td>`)
@@ -211,7 +198,7 @@ async function setData() {
                 td2 = $(`<td style="color:red;">-${objArray.Data[objArray.Data.length - 1].price}</td>`)
 
             let td3 = $(`<td>${objArray.Data[objArray.Data.length - 1].currentAmount}</td>`)
-            let td4 = $(`<td>${objArray.Data[objArray.Data.length - 1].dateTime}</td>`)
+            let td4 = $(`<td>${objArray.Data[objArray.Data.length - 1].dateTime.replace(/\d{4}\s/, '')}</td>`)
             tr.append(td1).append(td2).append(td3).append(td4)
             $('table tbody').prepend(tr)
         }
@@ -277,7 +264,7 @@ function updateSummary(a, b, c, data) {
     let date = new Date()
     let month = months[date.getMonth()].substring(0, 3)
     let year = date.getFullYear()
-
+console.log('summary u');
     $('#gistTotal').html(`Current total Amount is $ <strong>${c}</strong>`)
     $('#gistPrev10').html(`Last ${b} days expenditure sum is $ <strong>${a}</strong>`)
     let creditMonth = 0;
@@ -389,7 +376,7 @@ async function getContent() {
     let uid = localStorage.getItem('UID');
     let dbUsers = await db.collection('users')
     await dbUsers.doc(uid).get().then((para) => {
-        console.log(para);
+        // console.log(para);
         getInfo = para.data();
         // return para.data();
     }).catch((err) => {
@@ -409,7 +396,7 @@ function setDeviceInfo() {
         'loginTime': new Date().toTimeString(),
         'mobile': navigator.userAgentData.mobile
     }
-    console.log(getInfo);
+    // console.log(getInfo);
     if (!getInfo.loginInfo) {
         getInfo['loginInfo'] = [loginData]
     }
@@ -614,11 +601,11 @@ function createChart(data) {
         }
 
     })
-    document.getElementById('addData').addEventListener('click', () => {
-        // myChart3.data.labels=['aman','aanchal']
-        // myChart3.data.datasets[0].data=[210,100]
-        // myChart3.update();
-    })
+    // document.getElementById('addData').addEventListener('click', () => {
+    // myChart3.data.labels=['aman','aanchal']
+    // myChart3.data.datasets[0].data=[210,100]
+    // myChart3.update();
+    // })
     for (let i of Object.keys(priceTypeObj)) {
         option = $(`<option value="${i}">${i[0].toUpperCase() + i.substring(1)}</option>`)
         $('#types').append(option)
@@ -652,148 +639,18 @@ function createChart(data) {
     let yLabel = data.map(obj => obj.currentAmount)
     let typeName = data.map(obj => obj.type)
 
-    //     type: 'line',
-    //     data: {
-    //         labels: lineX,
-    //         datasets: [{
-    //             pointStyle: 'circle',
-    //             radius: 6,
-    //             hoverRadius: 10,
-    //             backgroundColor: '#ff6384',
-    //             // fill: {
-
-    //             //     target: 'origin',
-    //             //     above: '#ff6384',   // Area will be red above the origin
-    //             //     below: '#ff6384'    // And blue below the origin
-    //             // },
-    //             label: 'Price',
-    //             data: lineY,
-    //             borderColor: '#ff6384'  //#36a2eb
-    //             // borderColor:
-    //             //                 function(context) {
-    //             //                     // console.log(context.raw);
-
-    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-    //             //                     // console.log(bordercolor);
-    //             //                     return {
-    //             //                         borderColor: bordercolor,
-    //             // }}}]
-    //         }, {
-
-    //             pointStyle: 'line',
-    //             radius: 6,
-    //             hoverRadius: 10,
-    //             backgroundColor: 'blue',
-    //             // fill: {
-
-    //             //     target: 'origin',
-    //             //     above: '#ff6384',   // Area will be red above the origin
-    //             //     below: '#ff6384'    // And blue below the origin
-    //             // },
-    //             label: 'Price',
-    //             data: totalAmountList,
-    //             borderColor: '#36a2eb'  //
-    //             // borderColor:
-    //             //                 function(context) {
-    //             //                     // console.log(context.raw);
-
-    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-    //             //                     // console.log(bordercolor);
-    //             //                     return {
-    //             //                         borderColor: bordercolor,
-    //             // }}}]
-
-    //             // }, {
-
-
-    //             //     pointStyle: 'circle',
-    //             //     radius: 6,
-    //             //     hoverRadius: 10,
-    //             //     backgroundColor: '#36a2eb',
-    //             // fill: {
-
-    //             //     target: 'origin',
-    //             //     above: '#ff6384',   // Area will be red above the origin
-    //             //     below: '#ff6384'    // And blue below the origin
-    //             // },
-    //             // label: 'Price',
-    //             // data: [300, 100],
-    //             // borderColor: '#36a2eb'  //
-    //             // borderColor:
-    //             //                 function(context) {
-    //             //                     // console.log(context.raw);
-
-    //             //                     let bordercolor= context.raw>0? 'lightgreen':'black';
-    //             //                     // console.log(bordercolor);
-    //             //                     return {
-    //             //                         borderColor: bordercolor,
-    //             // }}}]
-
-
-    //         }]
-    //     },
-    //     options: {
-
-    //         responsive: true,
-
-    //         plugins: {
-    //             tooltip: {
-    //                 cornerRadius: 6,
-    //                 backgroundColor: '#ff6384',
-    //                 titleColor: '#000000',
-    //                 borderColor: '#ff6384',
-    //                 usePointStyle: false,
-    //                 borderWidth: 2,
-    //                 callbacks: {
-    //                     title: function (t, d) {
-    //                         // console.log(t, d);
-    //                         return "Today's:$ " + lineY[t[0].dataIndex];
-    //                     },
-    //                     label: function (t, d) {
-
-    //                         return lineType[t.dataIndex] + ' Total: ' + totalAmountList[t.dataIndex];
-    //                     },
-    //                     // labelColor: function (context) {
-
-    //                     //     let bordercolor = context.raw > 0 ? 'lightgreen' : 'black';
-    //                     //     return {
-    //                     //         borderColor: bordercolor,
-    //                     //         backgroundColor: 'rgb(255,0,0)',
-    //                     //         // color:'#000000',
-    //                     //         borderWidth: 2,
-    //                     //         borderDash: [2, 2],
-    //                     //         borderRadius: 2,
-    //                     //     };
-    //                     // },
-    //                     borderColor: '#ff6384',
-    //                     labelTextColor: function (context) {
-    //                         return '#000000';
-    //                     }
-    //                 },
-
-    //             }
-    //         }
-    //     }
-    // })
-
-
-
-    // console.log(myChart3.data.datasets);
-    // console.log(myChart3.data.labels);
-    // }
-    // console.log(lineX, lineY, totalAmountList);
     let lineDD = {
         labels: lineX,
         datasets: [
             {
-                hoverBorderWidth: 10,
+                hoverBorderWidth: 5,
                 label: 'Total: ',
                 data: totalAmountList,
                 borderColor: '#36a2eb',
                 // backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
             },
             {
-                hoverBorderWidth: 10,
+                hoverBorderWidth: 5,
                 type: 'line',
                 label: 'Expenditure: ',
                 data: lineY,
@@ -821,6 +678,21 @@ function createChart(data) {
         },
     })
 }
+document.getElementById('addData').addEventListener('click', () => {
+    console.log(getInfo.Data);
+    if (getInfo.Data) {
+        // if (true) {
+            document.getElementById('inlineRadio1').disabled = false;
+
+        // }
+    } else {
+        document.getElementById('inlineRadio1').disabled = true;
+        $("#inlineRadio2").prop("checked", true);
+        document.getElementById('types').disabled = true;
+        document.getElementById('type-name').disabled = true;
+
+    }
+})
 async function main() {
     // const response = await fetch('data.json');
     // let data = await response.json();
@@ -870,15 +742,15 @@ async function main() {
     // document.getElementById('myChart1').style.display = 'block';
     // document.getElementById('myChart2').style.display = 'block';
     // document.getElementById('myChart3').style.display = 'block'; try {
-    //     $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
+    $('#deviceInfo').text(`${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserName} v${getInfo.loginInfo[getInfo.loginInfo.length - 2].browserVersion} ${getInfo.loginInfo[getInfo.loginInfo.length - 2].platformName}`)
 
-    //     $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate + ' ' + getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
-    //     // console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
-    //     if (getInfo.loginInfo[getInfo.loginInfo.length - 2].mobile)
-    //         $('#deviceLogo').attr("src", "res/smartphone.png");
-    //     else
-    //         $('#deviceLogo').attr("src", "res/computer.png");
-    //     $('.toast').toast('show');
+    $('#lastLoginTime').text(getInfo.loginInfo[getInfo.loginInfo.length - 2].loginDate + ' ' + getInfo.loginInfo[getInfo.loginInfo.length - 2].loginTime)
+    // console.log(getInfo.loginInfo[getInfo.loginInfo.length - 2].time);
+    if (getInfo.loginInfo[getInfo.loginInfo.length - 2].mobile)
+        $('#deviceLogo').attr("src", "res/smartphone.png");
+    else
+        $('#deviceLogo').attr("src", "res/computer.png");
+    $('.toast').toast('show');
     // }
     // catch (error) {
     // }
@@ -1009,11 +881,6 @@ async function main() {
     //             }]
     //         }
 
-    //     })
-    //     document.getElementById('addData').addEventListener('click', () => {
-    //         // myChart3.data.labels=['aman','aanchal']
-    //         // myChart3.data.datasets[0].data=[210,100]
-    //         // myChart3.update();
     //     })
     //     for (let i of Object.keys(priceTypeObj)) {
     //         option = $(`<option value="${i}">${i}</option>`)
