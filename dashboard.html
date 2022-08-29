@@ -149,6 +149,24 @@
             </div>
             <img src="res/Spin-1s-200px.gif" alt="" id="gistGIF" class="chartGIF">
 
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are You Sure...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="underConfirm">Understood</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- <div class="container d-flex px-0"> -->
             <!-- <div class="row col-md-12 justify-content-end align-self-center"> -->
 
@@ -263,6 +281,8 @@
         <!-- <canvas id="myChart2" width="400px" height="400px"></canvas> -->
         <!-- </div> -->
     </div>
+
+
 
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>

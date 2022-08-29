@@ -12,6 +12,9 @@ let chartExist = false;
 const container = document.getElementById("exampleModal");
 const modal = new bootstrap.Modal(container);
 
+const container2 = document.getElementById("staticBackdrop");
+const modalConfirm = new bootstrap.Modal(container2);
+
 const firebaseConfig = {
     apiKey: "AIzaSyAHMHAHTCMnkxL_N2zLyA52QliQtk5jaqQ",
     authDomain: "budgetmonitor-68d6a.firebaseapp.com",
@@ -93,6 +96,7 @@ async function setData() {
     }
 
 
+    let currAmount = 0
     if (Number(amount)) {
         if (Number(amount) <= 10 && DoC == 'debit') {
             document.getElementById('amountHelp').innerText = 'Amount less than 10 not acceptable'
@@ -100,6 +104,27 @@ async function setData() {
         }
         else {
             amount = Number(amount);
+
+            if (Number(amount)) {
+                document.getElementById('amountHelp').innerText = ''
+                if ($('#inlineRadio1').is(':checked')) {
+                    amount = Number(amount)
+                    currAmount = totalAmountList[totalAmountList.length - 1]
+                    if (currAmount * 0.90 < amount && currAmount > amount) {
+                        $('#amountHelp').text(`Amount is greater than 90% ${currAmount * 0.90} of Current`)
+                        console.log('9090');
+                        modal.hide();
+                        modalConfirm.show()
+                        $('#underConfirm').click(() => setData2(objArray, amount, dateString, DoC))
+                        return
+                    }
+                    if (currAmount <= amount) {
+                        $('#amountHelp').text('Debit Amount is greater than Current Amount')
+                        console.log('ggg');
+                        return
+                    }
+                }
+            }
             // document.getElementById("saveBtn").disabled = true;
             // totalAmountList.push(currentAmount)
             // objArray['Data'].push({
@@ -114,13 +139,18 @@ async function setData() {
         document.getElementById('amountHelp').innerText = 'Invalid Amount'
         return
     }
-
+    setData2(objArray, amount, dateString, DoC)
     // if ($('#inlineRadio1').is(':checked')) {
     //     DoC = 'debit'
     // }
     // else
     //     DoC = 'credit'
     // console.log(objArray,' objArray');
+}
+function setData2(objArray, amount, dateString, DoC) {
+    let inpTypeVal = $('#type-name').val().toLowerCase()
+    let dropDownTypeVal = $('#types').val()
+
     if (Object.keys(objArray).length === 1) {
 
         // $("#inlineRadio2").prop("checked", true);
@@ -161,6 +191,7 @@ async function setData() {
 
     }
     modal.hide();
+    modalConfirm.hide()
     let piepriceType = priceTypeFunction(objArray.Data)
     // console.log(myChart2.data.labels);
     // console.log(myChart2.data.datasets);
@@ -190,7 +221,7 @@ async function setData() {
             if (objArray.Data[objArray.Data.length - 1].type == 'credit')
                 td1 = $(`<td>-</td>`)
             else
-                td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type[0].toUpperCase()+objArray.Data[objArray.Data.length - 1].type.substring(1)}</td>`)
+                td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type[0].toUpperCase() + objArray.Data[objArray.Data.length - 1].type.substring(1)}</td>`)
 
             if (objArray.Data[objArray.Data.length - 1].type == 'credit')
                 td2 = $(`<td style="color:green;">+${objArray.Data[objArray.Data.length - 1].price}</td>`)
@@ -264,7 +295,7 @@ function updateSummary(a, b, c, data) {
     let date = new Date()
     let month = months[date.getMonth()].substring(0, 3)
     let year = date.getFullYear()
-console.log('summary u');
+    console.log('summary u');
     $('#gistTotal').html(`Current total Amount is $ <strong>${c}</strong>`)
     $('#gistPrev10').html(`Last ${b} days expenditure sum is $ <strong>${a}</strong>`)
     let creditMonth = 0;
@@ -360,9 +391,19 @@ function typeInfo() {
 
 function validateAmount() {
     let amount = document.getElementById('amount-no').value
-
+    let currentAmount = 0
     if (Number(amount)) {
         document.getElementById('amountHelp').innerText = ''
+        if ($('#inlineRadio1').is(':checked')) {
+            amount = Number(amount)
+            currentAmount = totalAmountList[totalAmountList.length - 1]
+            if (currentAmount * 0.90 < amount && currentAmount >= amount) {
+                $('#amountHelp').html(`Amount is greater than 90% <strong>(${currentAmount * 0.90})</strong> of Current`)
+            }
+            if (currentAmount <= amount) {
+                $('#amountHelp').html(`Debit Amount is greater than Current Amount (<strong>${currentAmount}</strong>)`)
+            }
+        }
     } else
         document.getElementById('amountHelp').innerText = 'Invalid Amount'
 
@@ -681,10 +722,15 @@ function createChart(data) {
 document.getElementById('addData').addEventListener('click', () => {
     console.log(getInfo.Data);
     if (getInfo.Data) {
-        // if (true) {
-            document.getElementById('inlineRadio1').disabled = false;
 
-        // }
+        document.getElementById('inlineRadio1').disabled = false;
+        if (getInfo.Data[getInfo.Data.length - 1].currentAmount == 0) {
+            document.getElementById('inlineRadio1').disabled =true;
+            $("#inlineRadio2").prop("checked", true);
+            document.getElementById('types').disabled = true;
+            document.getElementById('type-name').disabled = true;
+        }
+
     } else {
         document.getElementById('inlineRadio1').disabled = true;
         $("#inlineRadio2").prop("checked", true);
