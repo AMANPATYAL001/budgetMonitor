@@ -40,7 +40,27 @@ h1 {
   /* width: 100%; */
   /* z-index: 9999; */
 }
-
+.add-modal{
+  background-image:url(res/index4.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.confirm-modal{
+  background-image:url(res/index6.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.offcanvas-body{
+  background-image:url(res/index9.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.list-group-item{
+  background-color: rgba(1, 1, 1, 0);
+}
 #wrapper {
   overflow-x: hidden;
   display: none;

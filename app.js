@@ -112,15 +112,14 @@ async function setData() {
                     currAmount = totalAmountList[totalAmountList.length - 1]
                     if (currAmount * 0.90 < amount && currAmount > amount) {
                         $('#amountHelp').text(`Amount is greater than 90% ${currAmount * 0.90} of Current`)
-                        console.log('9090');
                         modal.hide();
+                        $('.confirmMsg').html(`Are You Sure... <br>Amt. after deduct. is <strong>$${(currAmount-amount).toFixed(2)}</strong>`)
                         modalConfirm.show()
                         $('#underConfirm').click(() => setData2(objArray, amount, dateString, DoC))
                         return
                     }
                     if (currAmount <= amount) {
                         $('#amountHelp').text('Debit Amount is greater than Current Amount')
-                        console.log('ggg');
                         return
                     }
                 }
@@ -295,7 +294,6 @@ function updateSummary(a, b, c, data) {
     let date = new Date()
     let month = months[date.getMonth()].substring(0, 3)
     let year = date.getFullYear()
-    console.log('summary u');
     $('#gistTotal').html(`Current total Amount is $ <strong>${c}</strong>`)
     $('#gistPrev10').html(`Last ${b} days expenditure sum is $ <strong>${a}</strong>`)
     let creditMonth = 0;
@@ -720,9 +718,7 @@ function createChart(data) {
     })
 }
 document.getElementById('addData').addEventListener('click', () => {
-    console.log(getInfo.Data);
     if (getInfo.Data) {
-
         document.getElementById('inlineRadio1').disabled = false;
         if (getInfo.Data[getInfo.Data.length - 1].currentAmount == 0) {
             document.getElementById('inlineRadio1').disabled =true;
