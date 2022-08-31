@@ -32,6 +32,8 @@
                     <a class="nav-link active" href="" id="offCan" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Quick
                         Look👀</a>
+                    <a class="nav-link active" href="" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" id="newsBtn">News</button></a>
+
                     <button type="button" class="btn" id="logOut">Logout</button>
                 </div>
             </div>
@@ -122,7 +124,7 @@
 
             <div class="row">
                 <div class="col col-md-6">
-                    <div class="card">
+                    <div class="card aa">
                         <div class="card-body">
 
                             <!-- <p class="card-text">With supporting text below as a </p> -->
@@ -134,7 +136,7 @@
                     </div>
                 </div>
                 <div class="col col-md-6">
-                    <div class="card">
+                    <div class="card bb">
                         <div class="card-body">
 
                             <!-- <p class="card-text">With supporting text below as a </p> -->
@@ -149,8 +151,8 @@
             </div>
             <img src="res/Spin-1s-200px.gif" alt="" id="gistGIF" class="chartGIF">
 
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
-                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content confirm-modal">
                         <div class="modal-header">
@@ -208,7 +210,7 @@
             <!-- </div> -->
 
             <div class="row">
-                <div class="card w-100 col-12">
+                <div class="card w-100 col-12 cc dd">
                     <div class="card-body">
 
                         <!-- <p class="card-text">Daily progress.</p> -->
@@ -283,6 +285,17 @@
     </div>
 
 
+    <div class="offcanvas offcanvas-end" data-bs-scroll="true" aria-labelledby="offcanvasWithBothOptionsLabel"
+        tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 id="offcanvasRightLabel">Offcanvas right</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body" id="news-offcanvas">
+                <svg id="newsGIF" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin:auto;background:#fff;display:block;" width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"> <defs> <filter id="ldio-rg42i7z4np8-filter" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB"> <feGaussianBlur in="SourceGraphic" stdDeviation="2.4000000000000004"></feGaussianBlur> <feComponentTransfer result="cutoff"> <feFuncA type="table" tableValues="0 0 0 0 0 0 1 1 1 1 1"></feFuncA> </feComponentTransfer> </filter> </defs> <g filter="url(#ldio-rg42i7z4np8-filter)"><g transform="translate(50 50)"> <g> <circle cx="17" cy="0" r="5" fill="#e15b64"> <animate attributeName="r" keyTimes="0;0.5;1" values="3.5999999999999996;8.399999999999999;3.5999999999999996" dur="4s" repeatCount="indefinite" begin="-0.25s"></animate> </circle> <animateTransform attributeName="transform" type="rotate" keyTimes="0;1" values="0;360" dur="4s" repeatCount="indefinite" begin="0s"></animateTransform> </g> </g><g transform="translate(50 50)"> <g> <circle cx="17" cy="0" r="5" fill="#f47e60"> <animate attributeName="r" keyTimes="0;0.5;1" values="3.5999999999999996;8.399999999999999;3.5999999999999996" dur="2s" repeatCount="indefinite" begin="-0.2s"></animate> </circle> <animateTransform attributeName="transform" type="rotate" keyTimes="0;1" values="0;360" dur="2s" repeatCount="indefinite" begin="-0.05s"></animateTransform> </g> </g><g transform="translate(50 50)"> <g> <circle cx="17" cy="0" r="5" fill="#f8b26a"> <animate attributeName="r" keyTimes="0;0.5;1" values="3.5999999999999996;8.399999999999999;3.5999999999999996" dur="1.3333333333333333s" repeatCount="indefinite" begin="-0.15s"></animate> </circle> <animateTransform attributeName="transform" type="rotate" keyTimes="0;1" values="0;360" dur="1.3333333333333333s" repeatCount="indefinite" begin="-0.1s"></animateTransform> </g> </g><g transform="translate(50 50)"> <g> <circle cx="17" cy="0" r="5" fill="#abbd81"> <animate attributeName="r" keyTimes="0;0.5;1" values="3.5999999999999996;8.399999999999999;3.5999999999999996" dur="1s" repeatCount="indefinite" begin="-0.1s"></animate> </circle> <animateTransform attributeName="transform" type="rotate" keyTimes="0;1" values="0;360" dur="1s" repeatCount="indefinite" begin="-0.15s"></animateTransform> </g> </g><g transform="translate(50 50)"> <g> <circle cx="17" cy="0" r="5" fill="#849b87"> <animate attributeName="r" keyTimes="0;0.5;1" values="3.5999999999999996;8.399999999999999;3.5999999999999996" dur="0.8s" repeatCount="indefinite" begin="-0.05s"></animate> </circle> <animateTransform attributeName="transform" type="rotate" keyTimes="0;1" values="0;360" dur="0.8s" repeatCount="indefinite" begin="-0.2s"></animateTransform> </g> </g></g> </svg>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
@@ -300,6 +313,7 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
     <script src="app.js"></script>
+    <script src="news.js"></script>
 </body>
 
 </html>

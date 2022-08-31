@@ -223,9 +223,9 @@ function setData2(objArray, amount, dateString, DoC) {
                 td1 = $(`<td>${objArray.Data[objArray.Data.length - 1].type[0].toUpperCase() + objArray.Data[objArray.Data.length - 1].type.substring(1)}</td>`)
 
             if (objArray.Data[objArray.Data.length - 1].type == 'credit')
-                td2 = $(`<td style="color:green;">+${objArray.Data[objArray.Data.length - 1].price}</td>`)
+                td2 = $(`<td style="color:green;"><span class="badge rounded-pill bg-success">${objArray.Data[objArray.Data.length - 1].price}</span></td>`)
             else
-                td2 = $(`<td style="color:red;">-${objArray.Data[objArray.Data.length - 1].price}</td>`)
+                td2 = $(`<td style="color:red;"><span class="badge rounded-pill bg-danger">-${objArray.Data[objArray.Data.length - 1].price}</span></td>`)
 
             let td3 = $(`<td>${objArray.Data[objArray.Data.length - 1].currentAmount}</td>`)
             let td4 = $(`<td>${objArray.Data[objArray.Data.length - 1].dateTime.replace(/\d{4}\s/, '')}</td>`)
@@ -334,11 +334,11 @@ function drawTable() {
             }
             else if (j == 1) {
                 if (tableRowData.type == 'credit') {
-                    td.text(`+${tableRowData[values[j]]}`)
+                    td.html(`<span class="badge rounded-pill bg-success p-2">+${tableRowData[values[j]]}</span>`)
                     td.css("color", "green");
                 }
                 else {
-                    td.text(`-${tableRowData[values[j]]}`)
+                    td.html(`<span class="badge rounded-pill bg-danger p-2">-${tableRowData[values[j]]}</span>`)
                     td.css("color", "red");
 
                 }
