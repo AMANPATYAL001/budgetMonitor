@@ -56,8 +56,14 @@ h1 {
   background-size: cover;
 }
 
-.offcanvas-body {
+.leftCanvas {
   background-image: url(res/index9.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+#news-offcanvas {
+  background-image: url(res/index.svg);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -230,9 +236,9 @@ th {
   border-right: 6px solid #f38216;
 }
 
-.card{
+/* .aa,.bb,.cc{
   border: none !important;
-}
+} */
 
 .cc::before{
   border-bottom: 3px solid #f38216;
@@ -276,11 +282,12 @@ th {
   border-left: 5px solid green;
 }
 
-.card{
+.aa,.bb,.cc{
   border: none !important;
-}
+ }
 #newsGIF{
-  position: fixed;
+  position: absolute;
   top: 50%;
-  /* left: 40%; */
+  left: 20%;
+  z-index: 100;
 }
