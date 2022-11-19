@@ -1164,4 +1164,18 @@ window.addEventListener("DOMContentLoaded", function () {
 
 });
 
+const radioButtons = document.querySelectorAll('input[name="theme"]');
 
+for (var i = 0; i < radioButtons.length; i++) {
+    radioButtons[i].addEventListener('change', function() {
+        // (prev) ? console.log(prev.value): null;
+        // if (this !== prev) {
+        //     prev = this;
+        // }
+        console.log(this.value)
+        document.getElementsByTagName('link')[4].setAttribute('href',`res/${this.value}.css`);
+    });
+}
+
+// $('#themeChange').click(()=>{
+// })

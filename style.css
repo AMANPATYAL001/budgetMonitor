@@ -6,6 +6,12 @@
   /* overflow-y: auto; */
   scrollbar-gutter: stable;
 }
+/* .offcanvas{
+  z-index: 1050 !important;
+} */
+.offcanvas.showing, .offcanvas.hiding, .offcanvas.show {
+  visibility: visible;
+}
 
 h1 {
   font-family: 'Mouse Memoirs', sans-serif;
